@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import Link from 'next/link';
@@ -31,7 +31,7 @@ export default function EventCard({ event, featured = false }) {
         transition={{ duration: 0.6 }}
         data-testid={`featured-event-${event.id}`}
       >
-        <div className="relative aspect-[16/9] md:aspect-[21/9]">
+        <div className="relative min-h-[550px] sm:aspect-[4/5] md:aspect-[21/9]">
           <Image
             src={event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
             alt={event.title}
@@ -71,7 +71,7 @@ export default function EventCard({ event, featured = false }) {
               
               <div className="flex flex-col items-start md:items-end gap-4">
                 <CountdownTimer targetDate={event.date} />
-                <div className="flex gap-3">
+                <div className="flex items-center gap-4 mt-2">
                   <span className="text-2xl font-bold text-neon-gold">
                     {formatPrice(event.price)}
                   </span>

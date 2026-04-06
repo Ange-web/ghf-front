@@ -30,7 +30,7 @@ export default function HomePage() {
       const eventsData = eventsRes.data?.data || eventsRes.data || [];
       const galleryData = galleryRes.data?.data || galleryRes.data || [];
       const testimonialsData = testimonialsRes.data?.data || testimonialsRes.data || [];
-      
+
       setEvents(eventsData);
       setGallery(galleryData.slice(0, 4));
       setTestimonials(testimonialsData.slice(0, 3));
@@ -50,15 +50,16 @@ export default function HomePage() {
       {/* Hero Section */}
       <section className="hero-section" data-testid="hero-section">
         <div className="hero-bg">
-          <Image
-            src="https://images.unsplash.com/photo-1741767123174-a76960011e6c"
-            alt="Hero background"
-            fill
-            className="object-cover"
-            priority
+          <video
+            src="/video/splash_bg.mp4"
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/60" />
-          <div className="absolute inset-0 gradient-overlay" />
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute inset-0 gradient-overlay opacity-80" />
         </div>
 
         <div className="hero-content max-w-7xl mx-auto pt-32">
@@ -89,8 +90,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.6 }}
           >
-            GHF Agency organise les événements les plus exclusifs de Paris. 
-            Soirées VIP, concerts, expériences uniques — rejoignez notre communauté.
+            L’accès aux lieux les plus sélects de la capitale. Tables VIP, concerts privés et expériences sur-mesure.
           </motion.p>
 
           <motion.div
@@ -119,15 +119,17 @@ export default function HomePage() {
         </div>
 
         {/* Scroll Indicator */}
-        <motion.button
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 text-white/50 flex flex-col items-center gap-2"
-          onClick={scrollToEvents}
-          animate={{ y: [0, 10, 0] }}
-          transition={{ repeat: Infinity, duration: 2 }}
-        >
-          <span className="text-xs uppercase tracking-widest">Découvrir</span>
-          <ChevronDown size={24} />
-        </motion.button>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20">
+          <motion.button
+            className="text-white/50 flex flex-col items-center gap-2"
+            onClick={scrollToEvents}
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 2 }}
+          >
+            <span className="text-xs uppercase tracking-widest">Découvrir</span>
+            <ChevronDown size={24} />
+          </motion.button>
+        </div>
       </section>
 
       {/* Marquee */}
@@ -209,9 +211,8 @@ export default function HomePage() {
               {gallery.map((item, index) => (
                 <motion.div
                   key={item.id}
-                  className={`gallery-item rounded-xl overflow-hidden ${
-                    index === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square'
-                  }`}
+                  className={`gallery-item rounded-xl overflow-hidden ${index === 0 ? 'col-span-2 row-span-2 aspect-square' : 'aspect-square'
+                    }`}
                   initial={{ opacity: 0, scale: 0.9 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
@@ -253,9 +254,9 @@ export default function HomePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {testimonials.map((testimonial, index) => (
-                <TestimonialCard 
-                  key={testimonial.id} 
-                  testimonial={testimonial} 
+                <TestimonialCard
+                  key={testimonial.id}
+                  testimonial={testimonial}
                   index={index}
                 />
               ))}
@@ -266,12 +267,12 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-20 px-4 relative overflow-hidden" data-testid="cta-section">
-        <div 
+        <div
           className="absolute inset-0 bg-cover bg-center opacity-30"
           style={{ backgroundImage: 'url(https://images.pexels.com/photos/18718691/pexels-photo-18718691.jpeg)' }}
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/80" />
-        
+
         <div className="max-w-4xl mx-auto text-center relative z-10">
           <motion.h2
             className="heading-lg text-white mb-6"

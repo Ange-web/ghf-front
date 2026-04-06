@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, User, LogOut, Calendar, Image, Trophy, Home, Shield } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import Logo from './Logo';
 
 const navLinks = [
   { href: '/', label: 'Accueil', icon: Home },
@@ -18,7 +19,7 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
-  const { user, isAuthenticated, logout, openAuthModal } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout, openAuthModal } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -42,15 +43,7 @@ export default function Header() {
       >
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
           {/* Logo */}
-          <Link 
-            href="/" 
-            className="flex items-baseline gap-0.5 text-xl font-bold tracking-wider"
-            data-testid="header-logo"
-          >
-            <span className="text-neon-red">GHF</span>
-            <span className="text-white">_</span>
-            <span className="text-neon-gold">AGENCY</span>
-          </Link>
+          <Logo />
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-8" data-testid="desktop-nav">
@@ -74,7 +67,7 @@ export default function Header() {
           <div className="hidden md:flex items-center gap-4">
             {isAuthenticated ? (
               <div className="flex items-center gap-4">
-                {user?.role === 'admin' && (
+                {isAdmin && (
                   <Link
                     href="/admin"
                     className="flex items-center gap-2 text-sm text-neon-gold hover:text-[#E5C048] transition-colors"
@@ -91,6 +84,9 @@ export default function Header() {
                 >
                   <User size={18} />
                   <span>{user?.name}</span>
+                  <span className="text-[10px] text-white/20 ml-2 border border-white/10 px-1 rounded uppercase tracking-tighter">
+                    {user?.role || user?.user?.role || 'Guest'}
+                  </span>
                 </Link>
                 <button
                   onClick={logout}
@@ -183,6 +179,16 @@ export default function Header() {
             <div className="p-6 space-y-4">
               {isAuthenticated ? (
                 <>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="flex items-center justify-center gap-2 w-full py-3 text-neon-gold border border-neon-gold/20 rounded-full hover:bg-neon-gold/10 transition-colors"
+                      data-testid="mobile-admin-link"
+                    >
+                      <Shield size={18} />
+                      Dashboard Admin
+                    </Link>
+                  )}
                   <Link
                     href="/profile"
                     className="flex items-center justify-center gap-2 w-full py-3 text-white border border-white/20 rounded-full"

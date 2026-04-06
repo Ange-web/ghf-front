@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import Link from 'next/link';
 import { Mail, MapPin, Phone } from 'lucide-react';
+import Logo from './Logo';
 
 export default function Footer() {
   return (
@@ -11,11 +12,7 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           {/* Brand */}
           <div className="md:col-span-1">
-            <Link href="/" className="flex items-baseline gap-0.5 text-2xl font-bold tracking-wider mb-4">
-              <span className="text-neon-red">GHF</span>
-              <span className="text-white">_</span>
-              <span className="text-neon-gold">AGENCY</span>
-            </Link>
+            <Logo />
             <p className="text-white/50 text-sm leading-relaxed">
               L&apos;agence événementielle qui transforme vos nuits en expériences inoubliables.
             </p>

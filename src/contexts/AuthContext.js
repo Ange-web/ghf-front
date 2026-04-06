@@ -44,6 +44,7 @@ export function AuthProvider({ children }) {
         '/api/auth/login',
         { email, password }
       );
+      if (data.access_token) localStorage.setItem('token', data.access_token);
       setUser(data);
       return { success: true, data };
     } catch (error) {
@@ -58,6 +59,7 @@ export function AuthProvider({ children }) {
         '/api/auth/register',
         { name, email, password }
       );
+      if (data.access_token) localStorage.setItem('token', data.access_token);
       setUser(data);
       return { success: true, data };
     } catch (error) {
@@ -72,6 +74,7 @@ export function AuthProvider({ children }) {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
+      localStorage.removeItem('token');
       setUser(false);
     }
   };
@@ -99,7 +102,7 @@ export function AuthProvider({ children }) {
       logout, 
       updateProfile,
       isAuthenticated: !!user && user !== false,
-      isAdmin: user?.role === 'admin',
+      isAdmin: user?.role?.toLowerCase() === 'admin' || user?.user?.role?.toLowerCase() === 'admin' || user?.is_admin === true || user?.user?.is_admin === true,
       isAuthModalOpen,
       openAuthModal,
       closeAuthModal

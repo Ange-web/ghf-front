@@ -1,8 +1,9 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
+import Logo from './Logo';
 
 export default function SplashScreen({ show, onComplete }) {
   return (
@@ -15,19 +16,20 @@ export default function SplashScreen({ show, onComplete }) {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8, ease: "easeInOut" }}
         >
-          {/* Background Image */}
-          <div className="absolute inset-0 opacity-30">
-            <Image 
-              src="https://images.pexels.com/photos/14127764/pexels-photo-14127764.jpeg"
-              alt="Splash Background"
-              fill
-              className="object-cover"
-              priority
+          {/* Background Video */}
+          <div className="absolute inset-0 opacity-90">
+            <video
+              src="/video/splash_bg_2.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="w-full h-full object-cover md:object-contain"
             />
           </div>
           
           {/* Gradient Overlay */}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/10 to-black/60" />
           
           {/* Content */}
           <motion.div
@@ -37,16 +39,7 @@ export default function SplashScreen({ show, onComplete }) {
             transition={{ delay: 0.3, duration: 0.6 }}
           >
             {/* Logo */}
-            <motion.h1 
-              className="splash-logo flex items-baseline gap-1"
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              transition={{ delay: 0.5, duration: 0.5, type: "spring" }}
-            >
-              <span>GHF</span>
-              <span className="text-white">_</span>
-              <span>AGENCY</span>
-            </motion.h1>
+            <Logo />
             
             {/* Tagline */}
             <motion.p

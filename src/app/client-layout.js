@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { AuthProvider } from "@/contexts/AuthContext";
 import SplashScreen from "@/components/SplashScreen";
@@ -11,6 +12,8 @@ import { Toaster } from "@/components/ui/sonner";
 
 export function ClientLayout({ children }) {
   const [showSplash, setShowSplash] = useState(true);
+  const pathname = usePathname();
+  const isAdminRoute = pathname?.startsWith('/admin');
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -28,13 +31,13 @@ export function ClientLayout({ children }) {
           
           {!showSplash && (
             <>
-              <Header />
+              {!isAdminRoute && <Header />}
               
               <main>
                 {children}
               </main>
               
-              <Footer />
+              {!isAdminRoute && <Footer />}
               
               <AuthModal />
               

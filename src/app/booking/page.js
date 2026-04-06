@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -32,11 +32,12 @@ function BookingContent() {
 
   const fetchEvents = async () => {
     try {
-      const { data } = await api.get('/api/events');
-      setEvents(data);
+      const response = await api.get('/api/events');
+      const eventsData = response.data?.data || response.data || [];
+      setEvents(eventsData);
       
       const eventId = searchParams.get('event');
-      if (eventId && data.find(e => e.id === eventId)) {
+      if (eventId && eventsData.find(e => e.id === eventId)) {
         setFormData(prev => ({ ...prev, event_id: eventId }));
       }
     } catch (error) {
