@@ -1,12 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Shield, Users, Calendar, Image as ImageIcon, Trophy, Ticket,
   Plus, Edit, Trash2, Check, X, Loader2, BarChart3, Settings,
-  LogOut, Bell, Search, LayoutDashboard, ChevronRight, Menu
+  LogOut, Bell, Search, LayoutDashboard, ChevronRight, Menu,
+  Upload, Link
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
@@ -47,6 +48,18 @@ export default function AdminDashboard() {
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({});
 
+  // Gallery upload mode
+  const [galleryUploadMode, setGalleryUploadMode] = useState('file'); // 'file' | 'url'
+  const [galleryFile, setGalleryFile] = useState(null);
+  const [galleryFilePreview, setGalleryFilePreview] = useState(null);
+  const galleryFileInputRef = useRef(null);
+
+  // Event upload mode
+  const [eventUploadMode, setEventUploadMode] = useState('url'); // 'file' | 'url'
+  const [eventFile, setEventFile] = useState(null);
+  const [eventFilePreview, setEventFilePreview] = useState(null);
+  const eventFileInputRef = useRef(null);
+
   useEffect(() => {
     if (!authLoading && (!isAuthenticated || !isAdmin)) {
       router.push('/');
@@ -67,7 +80,7 @@ export default function AdminDashboard() {
         case 'dashboard': endpoint = '/api/admin/stats'; break;
         case 'events': endpoint = '/api/events'; break;
         case 'reservations': endpoint = '/api/reservations'; break;
-        case 'gallery': endpoint = '/api/gallery'; break;
+        case 'gallery': endpoint = '/api/admin/gallery'; break;
         case 'contests': endpoint = '/api/contests'; break;
         case 'users': endpoint = '/api/admin/users'; break;
         default: break;
@@ -93,6 +106,42 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleGalleryFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Seules les images sont acceptées');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Le fichier ne doit pas dépasser 10 MB');
+        return;
+      }
+      setGalleryFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setGalleryFilePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleEventFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Seules les images sont acceptées');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Le fichier ne doit pas dépasser 10 MB');
+        return;
+      }
+      setEventFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setEventFilePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -100,12 +149,61 @@ export default function AdminDashboard() {
       let endpoint = '';
       let payload = { ...formData };
 
+      // --- GALLERY: dual mode (file upload or URL) ---
+      if (activeTab === 'gallery' && !editingItem) {
+        if (galleryUploadMode === 'file') {
+          if (!galleryFile) {
+            toast.error('Veuillez sélectionner un fichier image');
+            setSaving(false);
+            return;
+          }
+          const fd = new FormData();
+          fd.append('image', galleryFile);
+          if (formData.title) fd.append('caption', formData.title);
+          if (formData.event_id) fd.append('eventId', formData.event_id);
+          await api.post('/api/gallery/upload', fd, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+          });
+        } else {
+          // URL mode
+          await api.post('/api/gallery', {
+            url: formData.url,
+            caption: formData.title || null,
+            eventId: formData.event_id || null,
+          });
+        }
+        toast.success('Image ajoutée avec succès !');
+        setShowForm(false);
+        setGalleryFile(null);
+        setGalleryFilePreview(null);
+        fetchData();
+        setSaving(false);
+        return;
+      }
+
       switch (activeTab) {
         case 'events': 
           endpoint = '/api/events';
-          // Format exact selon le vieux payload React
+
+          let finalImageUrl = payload.image_url || payload.imageUrl;
+          if (eventUploadMode === 'file' && eventFile) {
+            const uploadFd = new FormData();
+            uploadFd.append('image', eventFile);
+            const { data } = await api.post('/api/upload', uploadFd, {
+              headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            finalImageUrl = data.url;
+          } else if (eventUploadMode === 'file' && !eventFile && !editingItem) {
+            toast.error('Veuillez sélectionner une image pour l\'événement');
+            setSaving(false);
+            return;
+          }
+
           payload = {
             ...payload,
+            venue: payload.location || 'GHF Club, Paris',
+            description: payload.description || 'Rejoignez-nous pour cette soirée inoubliable avec GHF !',
+            image_url: finalImageUrl,
             date: new Date(payload.date).toISOString(),
             price: parseFloat(payload.price || 0),
             capacity: parseInt(payload.capacity || 100),
@@ -114,6 +212,7 @@ export default function AdminDashboard() {
             table_vip_price: parseFloat(payload.table_vip_price || 0),
             table_vip_capacity: parseInt(payload.table_vip_capacity || 0)
           };
+          delete payload.location;
           break;
         case 'gallery': 
           endpoint = '/api/gallery'; 
@@ -136,9 +235,20 @@ export default function AdminDashboard() {
       setShowForm(false);
       fetchData();
     } catch (error) {
-      toast.error(error.response?.data?.detail || "Erreur lors de la sauvegarde");
+      toast.error(error.response?.data?.detail || error.response?.data?.error || "Erreur lors de la sauvegarde");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangeRole = async (id, newRole) => {
+    try {
+      if (!window.confirm(`Voulez-vous donner le rôle ${newRole} à cet utilisateur ?`)) return;
+      await api.patch(`/api/admin/users/${id}/role`, { role: newRole });
+      toast.success("Rôle modifié avec succès !");
+      fetchData();
+    } catch (error) {
+      toast.error(error.response?.data?.error || "Erreur lors de la modification du rôle");
     }
   };
 
@@ -188,6 +298,16 @@ export default function AdminDashboard() {
             has_table_vip: false, table_vip_price: 300, table_vip_capacity: 5
         });
     }
+    // Reset gallery upload state
+    setGalleryFile(null);
+    setGalleryFilePreview(null);
+    setGalleryUploadMode('file');
+
+    // Reset event upload state
+    setEventFile(null);
+    setEventFilePreview(null);
+    setEventUploadMode(item && (item.image_url || item.imageUrl) ? 'url' : 'file');
+    
     setShowForm(true);
   };
 
@@ -518,9 +638,14 @@ export default function AdminDashboard() {
                                       </td>
                                       <td className="p-5 text-white/50 text-sm">{u.email}</td>
                                       <td className="p-5 text-center">
-                                          <span className={`text-[10px] px-3 py-1 rounded-full font-black tracking-widest ${u.role?.toLowerCase() === 'admin' ? 'bg-[#d6b37c]/20 text-[#d6b37c] border border-[#d6b37c]/30' : 'bg-white/5 text-white/40 border border-white/10'}`}>
-                                              {u.role?.toUpperCase()}
-                                          </span>
+                                          <select
+                                              value={u.role || 'USER'}
+                                              onChange={(e) => handleChangeRole(u.id, e.target.value)}
+                                              className={`text-[10px] px-3 py-1 rounded-full font-black tracking-widest outline-none cursor-pointer text-center ${u.role?.toLowerCase() === 'admin' ? 'bg-[#d6b37c]/20 text-[#d6b37c] border border-[#d6b37c]/30' : 'bg-[#1a1a1a] text-white/60 border border-white/10 hover:border-white/30 transition-colors'}`}
+                                          >
+                                              <option value="USER" className="bg-[#1a1a1a] text-white text-sm">USER</option>
+                                              <option value="ADMIN" className="bg-[#1a1a1a] text-white text-sm">ADMIN</option>
+                                          </select>
                                       </td>
                                       <td className="p-5 text-right">
                                           <div className="flex justify-end gap-2">
@@ -651,18 +776,192 @@ export default function AdminDashboard() {
                   </div>
                 )}
 
-                {(activeTab === 'events' || activeTab === 'gallery' || activeTab === 'contests') && (
+                {/* IMAGE INPUT — gallery dual mode */}
+                {activeTab === 'gallery' && !editingItem ? (
+                  <div className="md:col-span-2 space-y-4">
+                    {/* Mode toggle tabs */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setGalleryUploadMode('file')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          galleryUploadMode === 'file'
+                            ? 'bg-[#ff6b4a] text-white shadow-[0_0_15px_rgba(255,107,74,0.3)]'
+                            : 'bg-[#1a1a1a] text-white/50 border border-[#333] hover:border-[#ff6b4a]/50 hover:text-white'
+                        }`}
+                      >
+                        <Upload size={16} />
+                        Fichier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setGalleryUploadMode('url')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          galleryUploadMode === 'url'
+                            ? 'bg-[#ff6b4a] text-white shadow-[0_0_15px_rgba(255,107,74,0.3)]'
+                            : 'bg-[#1a1a1a] text-white/50 border border-[#333] hover:border-[#ff6b4a]/50 hover:text-white'
+                        }`}
+                      >
+                        <Link size={16} />
+                        URL
+                      </button>
+                    </div>
+
+                    {galleryUploadMode === 'file' ? (
+                      <div>
+                        <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Image (fichier) *</label>
+                        <input
+                          ref={galleryFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGalleryFileChange}
+                          className="hidden"
+                        />
+                        <div
+                          onClick={() => galleryFileInputRef.current?.click()}
+                          className={`w-full border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all hover:-translate-y-0.5 ${
+                            galleryFilePreview
+                              ? 'border-[#ff6b4a]/50 bg-[#ff6b4a]/5'
+                              : 'border-[#333] hover:border-[#ff6b4a]/30 bg-[#1a1a1a]'
+                          }`}
+                        >
+                          {galleryFilePreview ? (
+                            <div className="space-y-3">
+                              <img src={galleryFilePreview} alt="Preview" className="max-h-48 mx-auto rounded-xl object-contain shadow-lg" />
+                              <p className="text-white/50 text-sm">{galleryFile?.name} — <span className="text-[#ff6b4a]">{(galleryFile?.size / 1024 / 1024).toFixed(2)} MB</span></p>
+                              <p className="text-white/30 text-xs">Cliquez pour changer</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="w-16 h-16 mx-auto rounded-full bg-[#ff6b4a]/10 flex items-center justify-center">
+                                <Upload size={28} className="text-[#ff6b4a]" />
+                              </div>
+                              <p className="text-white/70 font-medium">Cliquez pour sélectionner une image</p>
+                              <p className="text-white/30 text-xs">PNG, JPG, WEBP — Max 10 MB</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">URL de l&apos;image *</label>
+                        <input
+                          type="url"
+                          required
+                          value={formData.url || ''}
+                          onChange={(e) => setFormData({...formData, url: e.target.value})}
+                          className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors"
+                          placeholder="https://..."
+                        />
+                        {formData.url && (
+                          <div className="mt-3">
+                            <img src={formData.url} alt="Preview" className="max-h-48 rounded-xl object-contain border border-[#222]" onError={(e) => e.target.style.display = 'none'} />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : activeTab === 'events' ? (
+                  <div className="md:col-span-2 space-y-4">
+                    {/* Mode toggle tabs */}
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setEventUploadMode('file')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          eventUploadMode === 'file'
+                            ? 'bg-[#ff6b4a] text-white shadow-[0_0_15px_rgba(255,107,74,0.3)]'
+                            : 'bg-[#1a1a1a] text-white/50 border border-[#333] hover:border-[#ff6b4a]/50 hover:text-white'
+                        }`}
+                      >
+                        <Upload size={16} />
+                        Fichier
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setEventUploadMode('url')}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                          eventUploadMode === 'url'
+                            ? 'bg-[#ff6b4a] text-white shadow-[0_0_15px_rgba(255,107,74,0.3)]'
+                            : 'bg-[#1a1a1a] text-white/50 border border-[#333] hover:border-[#ff6b4a]/50 hover:text-white'
+                        }`}
+                      >
+                        <Link size={16} />
+                        URL
+                      </button>
+                    </div>
+
+                    {eventUploadMode === 'file' ? (
+                      <div>
+                        <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Image (fichier) {editingItem ? '' : '*'}</label>
+                        <input
+                          ref={eventFileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleEventFileChange}
+                          className="hidden"
+                        />
+                        <div
+                          onClick={() => eventFileInputRef.current?.click()}
+                          className={`w-full border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all hover:-translate-y-0.5 ${
+                            eventFilePreview
+                              ? 'border-[#ff6b4a]/50 bg-[#ff6b4a]/5'
+                              : 'border-[#333] hover:border-[#ff6b4a]/30 bg-[#1a1a1a]'
+                          }`}
+                        >
+                          {eventFilePreview ? (
+                            <div className="space-y-3">
+                              <img src={eventFilePreview} alt="Preview" className="max-h-48 mx-auto rounded-xl object-contain shadow-lg" />
+                              <p className="text-white/50 text-sm">{eventFile?.name} — <span className="text-[#ff6b4a]">{(eventFile?.size / 1024 / 1024).toFixed(2)} MB</span></p>
+                              <p className="text-white/30 text-xs">Cliquez pour changer</p>
+                            </div>
+                          ) : editingItem && (formData.image_url || formData.imageUrl) ? (
+                            <div className="space-y-3">
+                              <img src={formData.image_url || formData.imageUrl} alt="Current event" className="max-h-48 mx-auto rounded-xl object-contain shadow-lg opacity-60" />
+                              <p className="text-white/70 font-medium">Cliquer pour remplacer l&apos;image existante</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-3">
+                              <div className="w-16 h-16 mx-auto rounded-full bg-[#ff6b4a]/10 flex items-center justify-center">
+                                <Upload size={28} className="text-[#ff6b4a]" />
+                              </div>
+                              <p className="text-white/70 font-medium">Cliquez pour sélectionner une image</p>
+                              <p className="text-white/30 text-xs">PNG, JPG, WEBP — Max 10 MB</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">URL de l&apos;image *</label>
+                        <input
+                          type="url"
+                          required
+                          value={formData.image_url || formData.imageUrl || ''}
+                          onChange={(e) => setFormData({...formData, image_url: e.target.value})}
+                          className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors"
+                          placeholder="https://..."
+                        />
+                        {(formData.image_url || formData.imageUrl) && (
+                          <div className="mt-3">
+                            <img src={formData.image_url || formData.imageUrl} alt="Preview" className="max-h-48 rounded-xl object-contain border border-[#222]" onError={(e) => e.target.style.display = 'none'} />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ) : ((activeTab === 'gallery' && editingItem) || activeTab === 'contests') && (
                   <div className="md:col-span-2">
                     <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">URL Image *</label>
                     <input type="url" required value={formData.image_url || formData.url || ''} onChange={(e) => setFormData({...formData, [activeTab === 'gallery' ? 'url' : 'image_url']: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors" placeholder="https://..." />
-                      {(activeTab === 'events' || activeTab === 'contests') && (
-                  <>
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Description</label>
-                      <textarea rows={3} required value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors resize-none" />
-                    </div>
-                  </>
-                )}              </div>
+                  </div>
+                )}
+
+                {(activeTab === 'events' || activeTab === 'contests') && (
+                  <div className="md:col-span-2">
+                    <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Description</label>
+                    <textarea rows={3} required value={formData.description || ''} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors resize-none" />
+                  </div>
                 )}
 
                 {activeTab === 'events' && (

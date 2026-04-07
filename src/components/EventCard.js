@@ -31,12 +31,21 @@ export default function EventCard({ event, featured = false }) {
         transition={{ duration: 0.6 }}
         data-testid={`featured-event-${event.id}`}
       >
-        <div className="relative min-h-[550px] sm:aspect-[4/5] md:aspect-[21/9]">
+        <div className="relative min-h-[550px] sm:aspect-[4/5] md:aspect-[21/9] bg-black overflow-hidden flex items-center justify-center">
+          {/* Blurred background */}
           <Image
-            src={event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+            src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+            alt=""
+            fill
+            className="object-cover opacity-30 blur-2xl scale-110"
+            priority={featured}
+          />
+          {/* Main image */}
+          <Image
+            src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
             alt={event.title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="(max-width: 768px) 100vw, 80vw"
             priority={featured}
           />
@@ -60,7 +69,7 @@ export default function EventCard({ event, featured = false }) {
                   </span>
                   <span className="flex items-center gap-2">
                     <MapPin size={16} className="text-neon-gold" />
-                    {event.location}
+                    {event.venue || event.location}
                   </span>
                   <span className="flex items-center gap-2">
                     <Users size={16} className="text-neon-gold" />
@@ -102,12 +111,20 @@ export default function EventCard({ event, featured = false }) {
         transition={{ duration: 0.5 }}
         data-testid={`event-card-${event.id}`}
       >
-        <div className="event-card-image">
+        <div className="event-card-image bg-black overflow-hidden relative flex items-center justify-center">
+          {/* Blurred background */}
           <Image
-            src={event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+            src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+            alt=""
+            fill
+            className="object-cover opacity-30 blur-xl scale-110"
+          />
+          {/* Main image */}
+          <Image
+            src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
             alt={event.title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
           />
           <div className="absolute inset-0 gradient-overlay opacity-60" />
@@ -154,7 +171,7 @@ export default function EventCard({ event, featured = false }) {
             </span>
             <span className="flex items-center gap-1.5">
               <MapPin size={14} className="text-neon-red" />
-              {event.location}
+              {event.venue || event.location}
             </span>
           </div>
           

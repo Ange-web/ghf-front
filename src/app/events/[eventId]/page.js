@@ -56,12 +56,21 @@ export default function EventDetailPage() {
   return (
     <div className="min-h-screen pt-20 pb-20" data-testid="event-detail-page">
       {/* Hero */}
-      <div className="relative h-[50vh] md:h-[60vh]">
+      <div className="relative h-[50vh] md:h-[70vh] bg-black overflow-hidden flex items-center justify-center">
+        {/* Blurred background */}
         <Image
-          src={event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+          src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
+          alt=""
+          fill
+          className="object-cover opacity-30 blur-2xl scale-110"
+          priority
+        />
+        {/* Main image */}
+        <Image
+          src={event.imageUrl || event.image_url || 'https://images.pexels.com/photos/11481894/pexels-photo-11481894.jpeg'}
           alt={event.title}
           fill
-          className="object-cover"
+          className="object-contain"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#050505] via-[#050505]/60 to-transparent" />
@@ -94,7 +103,7 @@ export default function EventDetailPage() {
                 </span>
                 <span className="flex items-center gap-2">
                   <MapPin size={18} className="text-neon-gold" />
-                  {event.location}
+                  {event.venue || event.location}
                 </span>
                 <span className="flex items-center gap-2">
                   <Users size={18} className="text-neon-gold" />
@@ -252,7 +261,7 @@ export default function EventDetailPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/60">Lieu</span>
-                  <span className="text-white">{event.location}</span>
+                  <span className="text-white">{event.venue || event.location}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-white/60">Places restantes</span>

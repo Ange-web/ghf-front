@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,7 +14,9 @@ export default function AuthModal() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    password: ''
+    password: '',
+    phone: '',
+    instagram: ''
   });
 
   const { login, register, isAuthModalOpen, closeAuthModal } = useAuth();
@@ -34,12 +36,12 @@ export default function AuthModal() {
       if (mode === 'login') {
         result = await login(formData.email, formData.password);
       } else {
-        result = await register(formData.name, formData.email, formData.password);
+        result = await register(formData.name, formData.email, formData.password, formData.phone, formData.instagram);
       }
 
       if (result.success) {
         closeAuthModal();
-        setFormData({ name: '', email: '', password: '' });
+        setFormData({ name: '', email: '', password: '', phone: '', instagram: '' });
       } else {
         setError(result.error);
       }
@@ -107,22 +109,52 @@ export default function AuthModal() {
             {/* Form */}
             <form onSubmit={handleSubmit} className="space-y-5">
               {mode === 'register' && (
-                <div>
-                  <label className="block text-sm text-white/70 mb-2">Nom complet</label>
-                  <div className="relative">
-                    <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      placeholder="Votre nom"
-                      className="form-input w-full pl-12 pr-4 py-3 rounded-lg"
-                      required={mode === 'register'}
-                      data-testid="auth-name-input"
-                    />
+                <>
+                  <div>
+                    <label className="block text-sm text-white/70 mb-2">Nom complet</label>
+                    <div className="relative">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                      <input
+                        type="text"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder="Votre nom"
+                        className="form-input w-full pl-12 pr-4 py-3 rounded-lg"
+                        required={mode === 'register'}
+                        data-testid="auth-name-input"
+                      />
+                    </div>
                   </div>
-                </div>
+                  <div>
+                    <label className="block text-sm text-white/70 mb-2">Instagram (facultatif)</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">@</span>
+                      <input
+                        type="text"
+                        name="instagram"
+                        value={formData.instagram}
+                        onChange={handleChange}
+                        placeholder="pseudo"
+                        className="form-input w-full pl-12 pr-4 py-3 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm text-white/70 mb-2">Numéro de téléphone (facultatif)</label>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">#</span>
+                      <input
+                        type="tel"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        placeholder="+33 6 12 34 56 78"
+                        className="form-input w-full pl-12 pr-4 py-3 rounded-lg"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div>

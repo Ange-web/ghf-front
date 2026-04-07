@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Download, Filter, Plus, Camera, Loader2, Check, Clock } from 'lucide-react';
+import { X, Download, Filter, Plus, Camera, Loader2, Check, Clock, Upload, Link } from 'lucide-react';
 import api from '@/lib/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
@@ -20,6 +20,10 @@ export default function GalleryPage() {
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadForm, setUploadForm] = useState({ title: '', url: '', event_id: '' });
+  const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
+  const [uploadFile, setUploadFile] = useState(null);
+  const [uploadFilePreview, setUploadFilePreview] = useState(null);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     fetchData();
@@ -48,10 +52,31 @@ export default function GalleryPage() {
 
   const fetchMyPhotos = async () => {
     try {
-      const { data } = await api.get('/api/photos/my');
-      setMyPhotos(data);
+      const { data } = await api.get('/api/gallery/my');
+      setMyPhotos(data?.data || data || []);
     } catch (error) {
-      console.error('Error fetching my photos:', error);
+      // Silently handle — endpoint may not exist yet
+      if (error.response?.status !== 404) {
+        console.error('Error fetching my photos:', error);
+      }
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Seules les images sont acceptées');
+        return;
+      }
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error('Le fichier ne doit pas dépasser 10 MB');
+        return;
+      }
+      setUploadFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => setUploadFilePreview(reader.result);
+      reader.readAsDataURL(file);
     }
   };
 
@@ -64,16 +89,38 @@ export default function GalleryPage() {
 
     setUploading(true);
     try {
-      await api.post('/api/photos/submit', uploadForm);
+      if (uploadMode === 'file') {
+        if (!uploadFile) {
+          toast.error('Veuillez sélectionner un fichier image');
+          setUploading(false);
+          return;
+        }
+        const fd = new FormData();
+        fd.append('image', uploadFile);
+        if (uploadForm.title) fd.append('caption', uploadForm.title);
+        if (uploadForm.event_id) fd.append('eventId', uploadForm.event_id);
+        await api.post('/api/gallery/upload', fd, {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        });
+      } else {
+        await api.post('/api/gallery', {
+          url: uploadForm.url,
+          caption: uploadForm.title,
+          eventId: uploadForm.event_id || null,
+        });
+      }
       setUploadSuccess(true);
       setUploadForm({ title: '', url: '', event_id: '' });
+      setUploadFile(null);
+      setUploadFilePreview(null);
       fetchMyPhotos();
+      fetchData();
       setTimeout(() => {
         setShowUploadModal(false);
         setUploadSuccess(false);
       }, 2000);
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Erreur lors de la soumission');
+      toast.error(error.response?.data?.detail || error.response?.data?.error || 'Erreur lors de la soumission');
     } finally {
       setUploading(false);
     }
@@ -145,42 +192,7 @@ export default function GalleryPage() {
           </button>
         </motion.div>
 
-        {/* My Photos Status */}
-        {isAuthenticated && myPhotos.length > 0 && (
-          <motion.div
-            className="mt-6 p-4 bg-[#0F0F13] rounded-lg border border-white/10"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            <h3 className="text-white font-medium mb-3 flex items-center gap-2">
-              <Camera size={18} className="text-neon-red" />
-              Mes soumissions ({myPhotos.length})
-            </h3>
-            <div className="flex flex-wrap gap-2">
-              {myPhotos.slice(0, 5).map((photo) => (
-                <div key={photo.id} className="relative">
-                  <Image
-                    src={photo.url}
-                    alt={photo.title}
-                    width={64}
-                    height={64}
-                    className="w-16 h-16 object-cover rounded"
-                  />
-                  <span className={`absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center text-xs ${
-                    photo.status === 'approved' ? 'bg-green-500' :
-                    photo.status === 'rejected' ? 'bg-red-500' : 'bg-yellow-500'
-                  }`}>
-                    {photo.status === 'approved' ? <Check size={12} /> :
-                     photo.status === 'rejected' ? <X size={12} /> : <Clock size={12} />}
-                  </span>
-                </div>
-              ))}
-              {myPhotos.length > 5 && (
-                <span className="text-white/50 text-sm self-center ml-2">+{myPhotos.length - 5} autres</span>
-              )}
-            </div>
-          </motion.div>
-        )}
+
       </div>
 
       {/* Gallery Grid */}
@@ -351,22 +363,99 @@ export default function GalleryPage() {
                         data-testid="photo-title-input"
                       />
                     </div>
-                    
+
+                    {/* Mode toggle */}
                     <div>
-                      <label className="block text-sm text-white/70 mb-2">URL de l&apos;image *</label>
-                      <input
-                        type="url"
-                        value={uploadForm.url}
-                        onChange={(e) => setUploadForm({...uploadForm, url: e.target.value})}
-                        placeholder="https://..."
-                        className="form-input w-full px-4 py-3 rounded-lg"
-                        required
-                        data-testid="photo-url-input"
-                      />
-                      <p className="text-xs text-white/40 mt-1">
-                        Collez le lien direct vers votre image (Imgur, Google Photos, etc.)
-                      </p>
+                      <label className="block text-sm text-white/70 mb-2">Source de l&apos;image *</label>
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setUploadMode('file')}
+                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                            uploadMode === 'file'
+                              ? 'bg-neon-red/20 text-neon-red border border-neon-red/30'
+                              : 'bg-[#1a1a1a] text-white/40 border border-white/10 hover:text-white/70'
+                          }`}
+                        >
+                          <Upload size={16} />
+                          Fichier
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setUploadMode('url')}
+                          className={`flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
+                            uploadMode === 'url'
+                              ? 'bg-neon-red/20 text-neon-red border border-neon-red/30'
+                              : 'bg-[#1a1a1a] text-white/40 border border-white/10 hover:text-white/70'
+                          }`}
+                        >
+                          <Link size={16} />
+                          URL
+                        </button>
+                      </div>
                     </div>
+
+                    {uploadMode === 'file' ? (
+                      <div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          className="hidden"
+                        />
+                        <div
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`w-full border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all hover:scale-[1.01] ${
+                            uploadFilePreview
+                              ? 'border-neon-red/40 bg-neon-red/5'
+                              : 'border-white/10 hover:border-neon-red/20 bg-[#0a0a0f]'
+                          }`}
+                        >
+                          {uploadFilePreview ? (
+                            <div className="space-y-2">
+                              <img src={uploadFilePreview} alt="Preview" className="max-h-40 mx-auto rounded-lg object-contain" />
+                              <p className="text-white/50 text-xs">{uploadFile?.name} — {(uploadFile?.size / 1024 / 1024).toFixed(2)} MB</p>
+                              <p className="text-white/30 text-[10px]">Cliquez pour changer</p>
+                            </div>
+                          ) : (
+                            <div className="space-y-2 py-2">
+                              <div className="w-12 h-12 mx-auto rounded-full bg-neon-red/10 flex items-center justify-center">
+                                <Upload size={22} className="text-neon-red" />
+                              </div>
+                              <p className="text-white/60 text-sm font-medium">Cliquez pour sélectionner</p>
+                              <p className="text-white/25 text-xs">PNG, JPG, WEBP — Max 10 MB</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <div>
+                        <input
+                          type="url"
+                          value={uploadForm.url}
+                          onChange={(e) => setUploadForm({...uploadForm, url: e.target.value})}
+                          placeholder="https://..."
+                          className="form-input w-full px-4 py-3 rounded-lg"
+                          required
+                          data-testid="photo-url-input"
+                        />
+                        <p className="text-xs text-white/40 mt-1">
+                          Collez le lien direct vers votre image (Imgur, Google Photos, etc.)
+                        </p>
+                        {uploadForm.url && (
+                          <div className="mt-3 relative w-full h-40">
+                            <Image
+                              src={uploadForm.url}
+                              alt="Preview"
+                              fill
+                              className="object-cover rounded-lg"
+                              unoptimized
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
                     
                     <div>
                       <label className="block text-sm text-white/70 mb-2">Événement associé</label>
@@ -384,21 +473,6 @@ export default function GalleryPage() {
                         ))}
                       </select>
                     </div>
-                    
-                    {uploadForm.url && (
-                      <div className="mt-4">
-                        <p className="text-sm text-white/70 mb-2">Aperçu :</p>
-                        <div className="relative w-full h-40">
-                          <Image
-                            src={uploadForm.url}
-                            alt="Preview"
-                            fill
-                            className="object-cover rounded-lg"
-                            unoptimized
-                          />
-                        </div>
-                      </div>
-                    )}
                     
                     <div className="p-3 bg-neon-red/10 rounded-lg border border-neon-red/20 text-sm text-white/70">
                       <p>Votre photo sera soumise à validation par un administrateur avant d&apos;apparaître dans la galerie publique.</p>

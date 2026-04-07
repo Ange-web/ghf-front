@@ -53,11 +53,11 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password) => {
+  const register = async (name, email, password, phone, instagram) => {
     try {
       const { data } = await api.post(
         '/api/auth/register',
-        { name, email, password }
+        { name, email, password, phone, instagram }
       );
       if (data.access_token) localStorage.setItem('token', data.access_token);
       setUser(data);
