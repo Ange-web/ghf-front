@@ -29,21 +29,20 @@ export function ClientLayout({ children }) {
         <div className="App min-h-screen bg-[#050505]">
           <SplashScreen show={showSplash} />
           
-          {!showSplash && (
-            <>
-              {!isAdminRoute && <Header />}
-              
-              <main>
-                {children}
-              </main>
-              
-              {!isAdminRoute && <Footer />}
-              
-              <AuthModal />
-              
-              <Toaster position="top-right" />
-            </>
-          )}
+          {/* Render content behind splash so it's ready when splash fades */}
+          <div style={{ visibility: showSplash ? 'hidden' : 'visible' }}>
+            {!isAdminRoute && <Header />}
+            
+            <main>
+              {children}
+            </main>
+            
+            {!isAdminRoute && <Footer />}
+            
+            <AuthModal />
+            
+            <Toaster position="top-right" />
+          </div>
         </div>
       </AuthProvider>
     </ThemeProvider>

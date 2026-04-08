@@ -44,6 +44,10 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://res.cloudinary.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://images.pexels.com" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href={process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000"} />
+        <link rel="preload" href="/video/splash_bg_2.mp4" as="video" type="video/mp4" />
       </head>
       <body className={outfit.className}>
         <ClientLayout>{children}</ClientLayout>

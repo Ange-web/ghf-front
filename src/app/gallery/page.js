@@ -1,33 +1,55 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, Filter, Plus, Camera, Loader2, Check, Clock, Upload, Link } from 'lucide-react';
 import api from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import Image from 'next/image';
 
+const ITEMS_PER_PAGE = 12;
+
 export default function GalleryPage() {
   const { isAuthenticated, openAuthModal } = useAuth();
+
+  // Initial data via cache hook
+  const { data: initialGallery, loading: initialLoading } = useApi(`/api/gallery?limit=${ITEMS_PER_PAGE}&page=1`);
+  const { data: eventsRaw } = useApi('/api/events?limit=50');
+
   const [items, setItems] = useState([]);
   const [events, setEvents] = useState([]);
   const [myPhotos, setMyPhotos] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [totalItems, setTotalItems] = useState(0);
   const [selectedItem, setSelectedItem] = useState(null);
   const [filterEvent, setFilterEvent] = useState('');
   const [showUploadModal, setShowUploadModal] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadForm, setUploadForm] = useState({ title: '', url: '', event_id: '' });
-  const [uploadMode, setUploadMode] = useState('file'); // 'file' | 'url'
+  const [uploadMode, setUploadMode] = useState('file');
   const [uploadFile, setUploadFile] = useState(null);
   const [uploadFilePreview, setUploadFilePreview] = useState(null);
   const fileInputRef = useRef(null);
 
+  // Sync initial data from cache hook
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (initialGallery) {
+      // initialGallery could be the raw array or have pagination info
+      const galleryItems = Array.isArray(initialGallery) ? initialGallery : initialGallery;
+      setItems(galleryItems);
+    }
+  }, [initialGallery]);
+
+  useEffect(() => {
+    if (eventsRaw) {
+      setEvents(Array.isArray(eventsRaw) ? eventsRaw : []);
+    }
+  }, [eventsRaw]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -35,19 +57,45 @@ export default function GalleryPage() {
     }
   }, [isAuthenticated]);
 
-  const fetchData = async () => {
+  // Reset when filter changes
+  useEffect(() => {
+    setPage(1);
+    setHasMore(true);
+    fetchFiltered(1);
+  }, [filterEvent]);
+
+  const fetchFiltered = async (p = 1) => {
     try {
-      const [galleryRes, eventsRes] = await Promise.all([
-        api.get('/api/gallery'),
-        api.get('/api/events?upcoming=false')
-      ]);
-      setItems(galleryRes.data?.data || galleryRes.data || []);
-      setEvents(eventsRes.data?.data || eventsRes.data || []);
+      const params = new URLSearchParams({ page: p, limit: ITEMS_PER_PAGE });
+      if (filterEvent) params.set('eventId', filterEvent);
+      const { data } = await api.get(`/api/gallery?${params}`);
+      const galleryItems = data?.data || data || [];
+      const pagination = data?.pagination;
+
+      if (p === 1) {
+        setItems(galleryItems);
+      } else {
+        setItems(prev => [...prev, ...galleryItems]);
+      }
+
+      if (pagination) {
+        setTotalItems(pagination.total);
+        setHasMore(p < pagination.pages);
+      } else {
+        setHasMore(galleryItems.length >= ITEMS_PER_PAGE);
+      }
     } catch (error) {
       console.error('Error fetching gallery:', error);
-    } finally {
-      setLoading(false);
     }
+  };
+
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const nextPage = page + 1;
+    setPage(nextPage);
+    await fetchFiltered(nextPage);
+    setLoadingMore(false);
   };
 
   const fetchMyPhotos = async () => {
@@ -55,7 +103,6 @@ export default function GalleryPage() {
       const { data } = await api.get('/api/gallery/my');
       setMyPhotos(data?.data || data || []);
     } catch (error) {
-      // Silently handle — endpoint may not exist yet
       if (error.response?.status !== 404) {
         console.error('Error fetching my photos:', error);
       }
@@ -114,7 +161,9 @@ export default function GalleryPage() {
       setUploadFile(null);
       setUploadFilePreview(null);
       fetchMyPhotos();
-      fetchData();
+      // Reset gallery to page 1
+      setPage(1);
+      fetchFiltered(1);
       setTimeout(() => {
         setShowUploadModal(false);
         setUploadSuccess(false);
@@ -125,10 +174,6 @@ export default function GalleryPage() {
       setUploading(false);
     }
   };
-
-  const filteredItems = filterEvent
-    ? items.filter(item => item.event_id === filterEvent)
-    : items;
 
   const handleDownload = (url, title) => {
     const link = document.createElement('a');
@@ -191,19 +236,17 @@ export default function GalleryPage() {
             Partager une photo
           </button>
         </motion.div>
-
-
       </div>
 
       {/* Gallery Grid */}
       <div className="max-w-7xl mx-auto px-4">
-        {loading ? (
+        {initialLoading && items.length === 0 ? (
           <div className="masonry-grid">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="skeleton h-64 rounded-xl" />
             ))}
           </div>
-        ) : filteredItems.length === 0 ? (
+        ) : items.length === 0 ? (
           <motion.div
             className="text-center py-20"
             initial={{ opacity: 0 }}
@@ -212,37 +255,71 @@ export default function GalleryPage() {
             <p className="text-white/50 text-lg">Aucune photo trouvée</p>
           </motion.div>
         ) : (
-          <div className="masonry-grid">
-            {filteredItems.map((item, index) => (
-              <motion.div
-                key={item.id}
-                className="gallery-item rounded-xl overflow-hidden cursor-pointer"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.05 }}
-                onClick={() => setSelectedItem(item)}
-                data-testid={`gallery-item-${item.id}`}
-              >
-                <div style={{ aspectRatio: index % 3 === 0 ? '1/1' : index % 3 === 1 ? '4/3' : '3/4' }} className="relative w-full">
-                  <Image
-                    src={item.url}
-                    alt={item.title || 'Image de la galerie'}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </div>
-                <div className="gallery-overlay">
-                  <div>
-                    <p className="text-white font-medium">{item.title}</p>
-                    {item.event_name && (
-                      <p className="text-white/60 text-sm">{item.event_name}</p>
-                    )}
+          <>
+            <div className="masonry-grid">
+              {items.map((item, index) => (
+                <motion.div
+                  key={item.id}
+                  className="gallery-item rounded-xl overflow-hidden cursor-pointer"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: Math.min(index * 0.03, 0.3) }}
+                  onClick={() => setSelectedItem(item)}
+                  data-testid={`gallery-item-${item.id}`}
+                >
+                  <div style={{ aspectRatio: index % 3 === 0 ? '1/1' : index % 3 === 1 ? '4/3' : '3/4' }} className="relative w-full">
+                    <Image
+                      src={item.url}
+                      alt={item.caption || 'Image de la galerie'}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      loading={index < 6 ? 'eager' : 'lazy'}
+                    />
                   </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+                  <div className="gallery-overlay">
+                    <div>
+                      <p className="text-white font-medium">{item.caption}</p>
+                      {item.event?.title && (
+                        <p className="text-white/60 text-sm">{item.event.title}</p>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            {hasMore && (
+              <div className="flex justify-center mt-12">
+                <button
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  className="btn-secondary px-8 py-3 rounded-full flex items-center gap-2 text-sm"
+                  data-testid="load-more-btn"
+                >
+                  {loadingMore ? (
+                    <>
+                      <Loader2 className="animate-spin" size={18} />
+                      Chargement...
+                    </>
+                  ) : (
+                    <>
+                      <Plus size={18} />
+                      Charger plus de photos
+                    </>
+                  )}
+                </button>
+              </div>
+            )}
+
+            {/* Item count */}
+            {totalItems > 0 && (
+              <p className="text-center text-white/30 text-xs mt-4">
+                {items.length} / {totalItems} photos
+              </p>
+            )}
+          </>
         )}
       </div>
 
@@ -275,7 +352,7 @@ export default function GalleryPage() {
               <div className="relative w-[90vw] h-[80vh] max-w-5xl">
                 <Image
                   src={selectedItem.url}
-                  alt={selectedItem.title || 'Image sélectionnée'}
+                  alt={selectedItem.caption || 'Image sélectionnée'}
                   fill
                   className="object-contain rounded-lg"
                 />
@@ -284,13 +361,13 @@ export default function GalleryPage() {
               <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent rounded-b-lg">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-white font-medium">{selectedItem.title}</p>
-                    {selectedItem.event_name && (
-                      <p className="text-white/60 text-sm">{selectedItem.event_name}</p>
+                    <p className="text-white font-medium">{selectedItem.caption}</p>
+                    {selectedItem.event?.title && (
+                      <p className="text-white/60 text-sm">{selectedItem.event.title}</p>
                     )}
                   </div>
                   <button
-                    onClick={() => handleDownload(selectedItem.url, selectedItem.title)}
+                    onClick={() => handleDownload(selectedItem.url, selectedItem.caption)}
                     className="btn-secondary px-4 py-2 rounded-full flex items-center gap-2 text-sm"
                     data-testid="download-image-btn"
                   >
@@ -506,4 +583,3 @@ export default function GalleryPage() {
     </div>
   );
 }
-

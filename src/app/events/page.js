@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { Search, Filter } from 'lucide-react';
-import api from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import EventCard from '@/components/EventCard';
 
 const categories = [
@@ -15,43 +15,22 @@ const categories = [
 ];
 
 export default function EventsPage() {
-  const [events, setEvents] = useState([]);
-  const [filteredEvents, setFilteredEvents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: eventsRaw, loading } = useApi('/api/events?limit=12');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
 
-  useEffect(() => {
-    fetchEvents();
-  }, []);
+  const events = useMemo(() => eventsRaw || [], [eventsRaw]);
 
-  useEffect(() => {
-    filterEvents();
-  }, [search, category, events]);
-
-  const fetchEvents = async () => {
-    try {
-      const { data } = await api.get('/api/events');
-      const eventsData = data?.data || data || [];
-      setEvents(eventsData);
-      setFilteredEvents(eventsData);
-    } catch (error) {
-      console.error('Error fetching events:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterEvents = () => {
+  const filteredEvents = useMemo(() => {
     let filtered = [...events];
     
     if (search) {
       const searchLower = search.toLowerCase();
       filtered = filtered.filter(
         event =>
-          event.title.toLowerCase().includes(searchLower) ||
-          event.description.toLowerCase().includes(searchLower) ||
-          event.location.toLowerCase().includes(searchLower)
+          event.title?.toLowerCase().includes(searchLower) ||
+          event.description?.toLowerCase().includes(searchLower) ||
+          event.venue?.toLowerCase().includes(searchLower)
       );
     }
     
@@ -59,8 +38,8 @@ export default function EventsPage() {
       filtered = filtered.filter(event => event.category === category);
     }
     
-    setFilteredEvents(filtered);
-  };
+    return filtered;
+  }, [events, search, category]);
 
   return (
     <div className="min-h-screen pt-24 pb-20" data-testid="events-page">
@@ -144,7 +123,7 @@ export default function EventsPage() {
                 key={event.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                transition={{ delay: Math.min(index * 0.08, 0.4) }}
               >
                 <EventCard event={event} />
               </motion.div>

@@ -1,45 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, ChevronDown } from 'lucide-react';
-import api from '@/lib/api';
+import { useApi } from '@/hooks/useApi';
 import EventCard from '@/components/EventCard';
 import TestimonialCard from '@/components/TestimonialCard';
 import Marquee from '@/components/Marquee';
 
 export default function HomePage() {
-  const [events, setEvents] = useState([]);
-  const [gallery, setGallery] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const { data: eventsRaw, loading: loadingEvents } = useApi('/api/events?limit=4');
+  const { data: galleryRaw, loading: loadingGallery } = useApi('/api/gallery?limit=4');
+  const { data: testimonialsRaw, loading: loadingTestimonials } = useApi('/api/testimonials');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    try {
-      const [eventsRes, galleryRes, testimonialsRes] = await Promise.all([
-        api.get('/api/events'),
-        api.get('/api/gallery'),
-        api.get('/api/testimonials')
-      ]);
-      const eventsData = eventsRes.data?.data || eventsRes.data || [];
-      const galleryData = galleryRes.data?.data || galleryRes.data || [];
-      const testimonialsData = testimonialsRes.data?.data || testimonialsRes.data || [];
-
-      setEvents(eventsData);
-      setGallery(galleryData.slice(0, 4));
-      setTestimonials(testimonialsData.slice(0, 3));
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const events = useMemo(() => eventsRaw || [], [eventsRaw]);
+  const gallery = useMemo(() => (galleryRaw || []).slice(0, 4), [galleryRaw]);
+  const testimonials = useMemo(() => (testimonialsRaw || []).slice(0, 3), [testimonialsRaw]);
+  const loading = loadingEvents || loadingGallery || loadingTestimonials;
 
   const scrollToEvents = () => {
     document.getElementById('events')?.scrollIntoView({ behavior: 'smooth' });
