@@ -7,8 +7,20 @@ import {
   Shield, Users, Calendar, Image as ImageIcon, Trophy, Ticket,
   Plus, Edit, Trash2, Check, X, Loader2, BarChart3, Settings,
   LogOut, Bell, Search, LayoutDashboard, ChevronRight, Menu,
-  Upload, Link
+  Upload, Link, RefreshCw, Eye, EyeOff, MessageCircle,
+  Star, AlertCircle, CheckCircle2, KeyRound
 } from 'lucide-react';
+
+// SVG Instagram inline (non disponible dans cette version de lucide-react)
+function InstagramIcon({ size = 16, className = '' }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+      <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
+    </svg>
+  );
+}
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import api from '@/lib/api';
@@ -31,6 +43,502 @@ const mockChartData = [
   { name: 'Sam', revenus: 22000, reservations: 180 },
   { name: 'Dim', revenus: 7000, reservations: 40 },
 ];
+
+// ──────────────────────────────────────────────────────────────
+// Instagram Curation Panel — composant autonome dans le dashboard
+// ──────────────────────────────────────────────────────────────
+function InstagramCurationPanel() {
+  const [inbox, setInbox] = useState([]);
+  const [approved, setApproved] = useState([]);
+  const [status, setStatus] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editContent, setEditContent] = useState('');
+  const [editRating, setEditRating] = useState(5);
+  const [editRole, setEditRole] = useState('');
+  const [shortToken, setShortToken] = useState('');
+  const [pageId, setPageId] = useState('');
+  const [savingToken, setSavingToken] = useState(false);
+  const [showTokenForm, setShowTokenForm] = useState(false);
+
+  // Saisie manuelle
+  const [showManualForm, setShowManualForm] = useState(false);
+  const [manualUsername, setManualUsername] = useState('');
+  const [manualContent, setManualContent] = useState('');
+  const [manualRating, setManualRating] = useState(5);
+  const [manualRole, setManualRole] = useState('');
+  const [manualPublish, setManualPublish] = useState(true);
+  const [savingManual, setSavingManual] = useState(false);
+
+  useEffect(() => { fetchAll(); }, []);
+
+  const fetchAll = async () => {
+    setLoading(true);
+    try {
+      const [inboxRes, approvedRes, statusRes] = await Promise.all([
+        api.get('/api/instagram/inbox'),
+        api.get('/api/instagram/approved'),
+        api.get('/api/instagram/status'),
+      ]);
+      setInbox(inboxRes.data);
+      setApproved(approvedRes.data);
+      setStatus(statusRes.data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSync = async () => {
+    setSyncing(true);
+    try {
+      const { data } = await api.get('/api/instagram/sync');
+      toast.success(`${data.imported} nouveau(x) message(s) importé(s)`);
+      fetchAll();
+    } catch (e) {
+      toast.error(e.response?.data?.error || 'Erreur de synchronisation');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const startEdit = (msg) => {
+    setEditingId(msg.id);
+    setEditContent(msg.content);
+    setEditRating(msg.rating || 5);
+    setEditRole(msg.authorRole || '');
+  };
+
+  const handleApprove = async (id) => {
+    try {
+      await api.post(`/api/instagram/approve/${id}`, {
+        content: editContent,
+        rating: editRating,
+        authorRole: editRole,
+      });
+      toast.success('Avis approuvé et publié !');
+      setEditingId(null);
+      fetchAll();
+    } catch (e) {
+      toast.error('Erreur lors de l\'approbation');
+    }
+  };
+
+  const handleReject = async (id) => {
+    if (!confirm('Supprimer ce message définitivement ?')) return;
+    try {
+      await api.post(`/api/instagram/reject/${id}`);
+      toast.success('Message supprimé');
+      fetchAll();
+    } catch (e) {
+      toast.error('Erreur');
+    }
+  };
+
+  const handleUnpublish = async (id) => {
+    try {
+      await api.delete(`/api/instagram/unpublish/${id}`);
+      toast.success('Avis retiré de la publication');
+      fetchAll();
+    } catch (e) {
+      toast.error('Erreur');
+    }
+  };
+
+  const handleManualSubmit = async (e) => {
+    e.preventDefault();
+    setSavingManual(true);
+    try {
+      await api.post('/api/instagram/manual', {
+        instagramUsername: manualUsername.replace(/^@/, ''),
+        content: manualContent,
+        rating: manualRating,
+        authorRole: manualRole || 'Client Instagram',
+        publishNow: manualPublish,
+      });
+      toast.success(manualPublish ? 'Avis ajouté et publié !' : 'Avis ajouté dans l\'inbox');
+      setManualUsername('');
+      setManualContent('');
+      setManualRating(5);
+      setManualRole('');
+      setShowManualForm(false);
+      fetchAll();
+    } catch (e) {
+      toast.error(e.response?.data?.error || 'Erreur lors de l\'ajout');
+    } finally {
+      setSavingManual(false);
+    }
+  };
+
+  const handleSaveToken = async (e) => {
+    e.preventDefault();
+    setSavingToken(true);
+    try {
+      const { data } = await api.post('/api/instagram/token', {
+        shortLivedToken: shortToken,
+        pageId: pageId || undefined,
+      });
+      toast.success(`Token configuré ! Expire le ${new Date(data.expiresAt).toLocaleDateString('fr-FR')}`);
+      setShortToken('');
+      setShowTokenForm(false);
+      fetchAll();
+    } catch (e) {
+      toast.error(e.response?.data?.error || 'Erreur de configuration du token');
+    } finally {
+      setSavingToken(false);
+    }
+  };
+
+  if (loading) return (
+    <div className="flex items-center justify-center py-20">
+      <Loader2 className="animate-spin text-[#ff6b4a]" size={32} />
+    </div>
+  );
+
+  const daysLeft = status?.daysLeft;
+  const tokenColor = daysLeft > 15 ? 'text-emerald-400' : daysLeft > 5 ? 'text-orange-400' : 'text-red-400';
+
+  return (
+    <div className="space-y-6">
+      {/* Header bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-5 bg-gradient-to-r from-[#833ab4]/10 via-[#fd1d1d]/10 to-[#fcb045]/10 border border-white/10 rounded-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#833ab4] via-[#fd1d1d] to-[#fcb045] flex items-center justify-center">
+            <InstagramIcon size={20} className="text-white" />
+          </div>
+          <div>
+            <h2 className="text-white font-bold">Curation des Avis Instagram</h2>
+            <p className="text-white/40 text-xs">
+              {status?.configured
+                ? <span className={tokenColor}>Token actif — expire dans {daysLeft} jours</span>
+                : <span className="text-red-400">Aucun token configuré</span>
+              }
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={() => { setShowManualForm(v => !v); setShowTokenForm(false); }}
+            className="flex items-center gap-2 px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs font-bold transition-colors"
+          >
+            <Plus size={14} />
+            Ajouter manuellement
+          </button>
+          <button
+            onClick={() => { setShowTokenForm(v => !v); setShowManualForm(false); }}
+            className="flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-white/70 text-xs transition-colors"
+          >
+            <KeyRound size={14} />
+            {status?.configured ? 'Renouveler token' : 'Configurer token'}
+          </button>
+          <button
+            onClick={handleSync}
+            disabled={syncing || !status?.configured}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#833ab4] to-[#fd1d1d] hover:opacity-90 rounded-xl text-white text-xs font-bold transition-opacity disabled:opacity-40"
+          >
+            <RefreshCw size={14} className={syncing ? 'animate-spin' : ''} />
+            Synchroniser les DMs
+          </button>
+        </div>
+      </div>
+
+      {/* Formulaire de saisie manuelle */}
+      {showManualForm && (
+        <div className="p-5 bg-[#111] border border-emerald-500/20 rounded-2xl">
+          <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+            <Plus size={16} className="text-emerald-400" />
+            Ajouter un avis manuellement
+          </h3>
+          <p className="text-white/40 text-xs mb-4 leading-relaxed">
+            Lis le DM sur ton Instagram, puis retranscris-le ici. L'avis sera affiché avec le badge "Vérifié Instagram".
+          </p>
+          <form onSubmit={handleManualSubmit} className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="text-white/40 text-xs uppercase tracking-wider block mb-1">Compte Instagram</label>
+                <input
+                  type="text"
+                  value={manualUsername}
+                  onChange={e => setManualUsername(e.target.value)}
+                  placeholder="maelle_mnl93"
+                  className="w-full bg-[#1a1a1a] border border-[#333] focus:border-emerald-500 text-white px-4 py-3 rounded-xl outline-none transition-colors text-sm"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-white/40 text-xs uppercase tracking-wider block mb-1">Note</label>
+                <select
+                  value={manualRating}
+                  onChange={e => setManualRating(Number(e.target.value))}
+                  className="bg-[#1a1a1a] border border-[#333] text-white px-3 py-3 rounded-xl outline-none text-sm h-[46px]"
+                >
+                  {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} ⭐</option>)}
+                </select>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider block mb-1">Contenu du DM</label>
+              <textarea
+                value={manualContent}
+                onChange={e => setManualContent(e.target.value)}
+                rows={4}
+                placeholder="Copie ici le message envoyé par la personne dans ses DMs..."
+                className="w-full bg-[#1a1a1a] border border-[#333] focus:border-emerald-500 text-white px-4 py-3 rounded-xl outline-none transition-colors text-sm resize-none"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="text-white/40 text-xs uppercase tracking-wider block mb-1">Rôle affiché (optionnel)</label>
+              <input
+                type="text"
+                value={manualRole}
+                onChange={e => setManualRole(e.target.value)}
+                placeholder="Cliente VIP, Habituée, ..."
+                className="w-full bg-[#1a1a1a] border border-[#333] focus:border-emerald-500 text-white px-4 py-3 rounded-xl outline-none transition-colors text-sm"
+              />
+            </div>
+
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <div
+                onClick={() => setManualPublish(v => !v)}
+                className={`w-10 h-5 rounded-full transition-colors relative ${manualPublish ? 'bg-emerald-500' : 'bg-white/10'}`}
+              >
+                <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${manualPublish ? 'left-5' : 'left-0.5'}`} />
+              </div>
+              <span className="text-white/60 text-xs">
+                {manualPublish ? 'Publier immédiatement sur le site' : 'Mettre dans l\'inbox pour révision'}
+              </span>
+            </label>
+
+            <div className="flex gap-2 pt-1">
+              <button
+                type="submit"
+                disabled={savingManual}
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/30 rounded-xl font-bold text-sm disabled:opacity-50 transition-colors"
+              >
+                {savingManual ? <><Loader2 size={16} className="animate-spin" />Ajout...</> : <><Check size={16} />{manualPublish ? 'Ajouter & Publier' : 'Ajouter dans l\'inbox'}</>}
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowManualForm(false)}
+                className="px-4 py-3 bg-white/5 hover:bg-white/10 text-white/50 rounded-xl text-sm transition-colors"
+              >
+                <X size={16} />
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Token config form */}
+      {showTokenForm && (
+        <div className="p-5 bg-[#111] border border-[#333] rounded-2xl">
+          <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+            <KeyRound size={16} className="text-[#fcb045]" />
+            Configuration du Token Meta
+          </h3>
+          <p className="text-white/40 text-xs mb-4 leading-relaxed">
+            1. Va sur <span className="text-[#fcb045]">developers.facebook.com → Explorateur d'API Graph</span><br/>
+            2. Génère un token avec les permissions : <code className="bg-white/10 px-1 rounded">instagram_manage_messages</code>, <code className="bg-white/10 px-1 rounded">instagram_basic</code><br/>
+            3. Colle-le ci-dessous. Il sera échangé automatiquement en Long-lived Token (60 jours).
+          </p>
+          <form onSubmit={handleSaveToken} className="flex flex-col gap-3">
+            <input
+              type="text"
+              value={shortToken}
+              onChange={e => setShortToken(e.target.value)}
+              placeholder="Short-lived Access Token (depuis l'API Graph Explorer)"
+              className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#fd1d1d] text-white px-4 py-3 rounded-xl outline-none transition-colors text-sm"
+              required
+            />
+            <input
+              type="text"
+              value={pageId}
+              onChange={e => setPageId(e.target.value)}
+              placeholder="Facebook Page ID (optionnel si défini dans .env)"
+              className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#fd1d1d] text-white px-4 py-3 rounded-xl outline-none transition-colors text-sm"
+            />
+            <button
+              type="submit"
+              disabled={savingToken}
+              className="flex items-center justify-center gap-2 py-3 bg-gradient-to-r from-[#833ab4] to-[#fd1d1d] rounded-xl text-white font-bold text-sm disabled:opacity-50"
+            >
+              {savingToken ? <><Loader2 size={16} className="animate-spin" />Échange en cours...</> : 'Configurer le token'}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Two-panel layout */}
+      <div className="grid lg:grid-cols-2 gap-6">
+
+        {/* LEFT — Flux Entrant */}
+        <div className="bg-[#111] border border-[#222] rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between p-5 border-b border-[#222]">
+            <div className="flex items-center gap-2">
+              <MessageCircle size={16} className="text-[#fd1d1d]" />
+              <span className="text-white font-bold text-sm">Flux Entrant</span>
+              {inbox.length > 0 && (
+                <span className="px-2 py-0.5 bg-[#fd1d1d]/20 text-[#fd1d1d] text-xs rounded-full font-bold">{inbox.length}</span>
+              )}
+            </div>
+            <span className="text-white/30 text-xs">DMs non traités</span>
+          </div>
+
+          <div className="divide-y divide-[#1a1a1a] max-h-[600px] overflow-y-auto">
+            {inbox.length === 0 ? (
+              <div className="py-16 text-center text-white/30 text-sm">
+                <CheckCircle2 size={32} className="mx-auto mb-3 text-white/10" />
+                Aucun message en attente
+              </div>
+            ) : inbox.map(msg => (
+              <div key={msg.id} className="p-5">
+                {/* Author */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#833ab4] to-[#fcb045] flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {msg.instagramUsername?.charAt(0).toUpperCase() || 'I'}
+                  </div>
+                  <div>
+                    <p className="text-white text-sm font-semibold">@{msg.instagramUsername || msg.authorName}</p>
+                    <p className="text-white/30 text-xs">{new Date(msg.createdAt).toLocaleDateString('fr-FR')}</p>
+                  </div>
+                </div>
+
+                {/* Édition ou affichage */}
+                {editingId === msg.id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-white/40 text-xs uppercase tracking-wider">Contenu original</label>
+                      <p className="text-white/40 text-xs italic mt-1 line-through">{msg.originalContent}</p>
+                    </div>
+                    <textarea
+                      value={editContent}
+                      onChange={e => setEditContent(e.target.value)}
+                      rows={3}
+                      className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#833ab4] text-white px-3 py-2 rounded-xl outline-none text-sm resize-none"
+                    />
+                    <div className="flex gap-3">
+                      <div className="flex-1">
+                        <label className="text-white/40 text-xs">Rôle affiché</label>
+                        <input
+                          value={editRole}
+                          onChange={e => setEditRole(e.target.value)}
+                          placeholder="Client VIP, Habitué..."
+                          className="w-full bg-[#1a1a1a] border border-[#333] focus:border-[#833ab4] text-white px-3 py-2 rounded-xl outline-none text-sm mt-1"
+                        />
+                      </div>
+                      <div>
+                        <label className="text-white/40 text-xs">Note</label>
+                        <select
+                          value={editRating}
+                          onChange={e => setEditRating(Number(e.target.value))}
+                          className="bg-[#1a1a1a] border border-[#333] text-white px-3 py-2 rounded-xl outline-none text-sm mt-1 w-full"
+                        >
+                          {[5,4,3,2,1].map(n => <option key={n} value={n}>{n} ⭐</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleApprove(msg.id)}
+                        className="flex-1 flex items-center justify-center gap-2 py-2 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-400 border border-emerald-500/20 rounded-xl text-sm font-bold transition-colors"
+                      >
+                        <Check size={15} /> Approuver &amp; Publier
+                      </button>
+                      <button
+                        onClick={() => setEditingId(null)}
+                        className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white/50 rounded-xl text-sm transition-colors"
+                      >
+                        <X size={15} />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-4">"{msg.content}"</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEdit(msg)}
+                        className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-[#833ab4]/10 hover:bg-[#833ab4]/20 text-[#c084fc] border border-[#833ab4]/20 rounded-xl text-xs font-bold transition-colors"
+                      >
+                        <Edit size={13} /> Éditer &amp; Approuver
+                      </button>
+                      <button
+                        onClick={() => handleApprove(msg.id)}
+                        className="flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/20 rounded-xl text-xs transition-colors"
+                        title="Approuver sans modifier"
+                      >
+                        <Check size={13} />
+                      </button>
+                      <button
+                        onClick={() => handleReject(msg.id)}
+                        className="flex items-center justify-center px-3 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 rounded-xl text-xs transition-colors"
+                        title="Rejeter"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* RIGHT — Avis en ligne */}
+        <div className="bg-[#111] border border-[#222] rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between p-5 border-b border-[#222]">
+            <div className="flex items-center gap-2">
+              <Eye size={16} className="text-emerald-400" />
+              <span className="text-white font-bold text-sm">Avis en ligne</span>
+              {approved.length > 0 && (
+                <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs rounded-full font-bold">{approved.length}</span>
+              )}
+            </div>
+            <span className="text-white/30 text-xs">Publiés sur le site</span>
+          </div>
+
+          <div className="divide-y divide-[#1a1a1a] max-h-[600px] overflow-y-auto">
+            {approved.length === 0 ? (
+              <div className="py-16 text-center text-white/30 text-sm">
+                <InstagramIcon size={32} className="mx-auto mb-3 text-white/10" />
+                Aucun avis publié
+              </div>
+            ) : approved.map(msg => (
+              <div key={msg.id} className="p-5 flex gap-4">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#833ab4] to-[#fcb045] flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
+                  {msg.instagramUsername?.charAt(0).toUpperCase() || 'I'}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2 mb-1">
+                    <p className="text-white text-sm font-semibold truncate">@{msg.instagramUsername || msg.authorName}</p>
+                    <div className="flex text-[#d6b37c] shrink-0">
+                      {[...Array(msg.rating || 5)].map((_, i) => <Star key={i} size={10} className="fill-current" />)}
+                    </div>
+                  </div>
+                  {msg.authorRole && <p className="text-white/30 text-xs mb-1">{msg.authorRole}</p>}
+                  <p className="text-white/60 text-xs leading-relaxed line-clamp-2">"{msg.content}"</p>
+                </div>
+                <button
+                  onClick={() => handleUnpublish(msg.id)}
+                  className="shrink-0 p-2 bg-white/5 hover:bg-red-500/10 text-white/30 hover:text-red-400 rounded-lg transition-colors"
+                  title="Retirer de la publication"
+                >
+                  <EyeOff size={14} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const router = useRouter();
@@ -328,6 +836,7 @@ export default function AdminDashboard() {
     { id: 'gallery', label: 'V.I.P Gallery', icon: ImageIcon },
     { id: 'users', label: 'Membres', icon: Users },
     { id: 'contests', label: 'Concours', icon: Trophy },
+    { id: 'instagram', label: 'Avis Instagram', icon: InstagramIcon },
   ];
 
   return (
@@ -591,11 +1100,11 @@ export default function AdminDashboard() {
                                       <td className="p-4">{r.guests} pers.</td>
                                       <td className="p-4">
                                          <span className={`text-xs px-3 py-1 rounded-full font-bold ${
-                                             r.status === 'confirmed' ? 'bg-green-500/10 text-green-500 border border-green-500/20' : 
-                                             r.status === 'pending' ? 'bg-[#d6b37c]/10 text-[#d6b37c] border border-[#d6b37c]/20' : 
+                                             r.status === 'confirmed' ? 'bg-green-500/10 text-green-500 border border-green-500/20' :
+                                             r.status === 'pending' ? 'bg-[#d6b37c]/10 text-[#d6b37c] border border-[#d6b37c]/20' :
                                              'bg-red-500/10 text-red-500 border border-red-500/20'
                                          }`}>
-                                             {r.status.toUpperCase()}
+                                             {r.status?.toUpperCase() ?? '—'}
                                          </span>
                                       </td>
                                       <td className="p-4 text-right">
@@ -737,7 +1246,13 @@ export default function AdminDashboard() {
                       ))}
                    </div>
               )}
-              
+
+
+              {/* === INSTAGRAM CURATION === */}
+              {activeTab === 'instagram' && (
+                <InstagramCurationPanel />
+              )}
+
             </motion.div>
           </AnimatePresence>
         </main>

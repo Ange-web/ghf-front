@@ -19,10 +19,11 @@ export default function Footer() {
             
             {/* Social Links */}
             <div className="flex gap-4 mt-6">
-              <a 
-                href="https://instagram.com" 
-                target="_blank" 
+              <a
+                href="https://instagram.com"
+                target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Suivez-nous sur Instagram"
                 className="text-white/40 hover:text-neon-red transition-colors"
                 data-testid="social-instagram"
               >
@@ -32,10 +33,11 @@ export default function Footer() {
                   <line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/>
                 </svg>
               </a>
-              <a 
-                href="https://twitter.com" 
-                target="_blank" 
+              <a
+                href="https://twitter.com"
+                target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Suivez-nous sur Twitter / X"
                 className="text-white/40 hover:text-neon-red transition-colors"
                 data-testid="social-twitter"
               >
@@ -43,10 +45,11 @@ export default function Footer() {
                   <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
                 </svg>
               </a>
-              <a 
-                href="https://youtube.com" 
-                target="_blank" 
+              <a
+                href="https://youtube.com"
+                target="_blank"
                 rel="noopener noreferrer"
+                aria-label="Suivez-nous sur YouTube"
                 className="text-white/40 hover:text-neon-red transition-colors"
                 data-testid="social-youtube"
               >
@@ -140,7 +143,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-white/30 text-sm">
-            Â© {new Date().getFullYear()} GHF Agency. Tous droits réservés.
+            © {new Date().getFullYear()} GHF Agency. Tous droits réservés.
           </p>
           <p className="text-white/30 text-sm">
             Crafted with <span className="text-neon-red">♥</span> in Paris

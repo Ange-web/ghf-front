@@ -100,8 +100,8 @@ export default function EventsPage() {
       {/* Events Grid */}
       <div className="max-w-7xl mx-auto px-4">
         {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {[...Array(8)].map((_, i) => (
               <div key={i} className="skeleton h-80 rounded-xl" />
             ))}
           </div>
@@ -117,10 +117,11 @@ export default function EventsPage() {
             </p>
           </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 items-stretch">
             {filteredEvents.map((event, index) => (
               <motion.div
                 key={event.id}
+                className="h-full"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: Math.min(index * 0.08, 0.4) }}

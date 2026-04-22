@@ -35,7 +35,15 @@ export default function Header() {
 
   return (
     <>
-      <header 
+      {/* Skip to main content */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-neon-red focus:text-white focus:rounded-lg focus:text-sm focus:font-semibold"
+      >
+        Aller au contenu principal
+      </a>
+
+      <header
         className={`header-glass transition-all duration-300 ${
           isScrolled ? 'py-3' : 'py-4'
         }`}
@@ -90,7 +98,8 @@ export default function Header() {
                 </Link>
                 <button
                   onClick={logout}
-                  className="text-white/70 hover:text-neon-red transition-colors"
+                  className="text-white/70 hover:text-neon-red transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+                  aria-label="Se déconnecter"
                   data-testid="logout-btn"
                 >
                   <LogOut size={18} />
@@ -116,8 +125,11 @@ export default function Header() {
 
           {/* Mobile Menu Button */}
           <button
-            className="md:hidden text-white p-2"
+            className="md:hidden text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
             onClick={() => setIsMenuOpen(true)}
+            aria-label="Ouvrir le menu de navigation"
+            aria-expanded={isMenuOpen}
+            aria-controls="mobile-menu"
             data-testid="mobile-menu-btn"
           >
             <Menu size={24} />
@@ -129,6 +141,7 @@ export default function Header() {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
+            id="mobile-menu"
             className="mobile-menu flex flex-col"
             initial={{ opacity: 0, x: '100%' }}
             animate={{ opacity: 1, x: 0 }}
@@ -140,7 +153,8 @@ export default function Header() {
             <div className="flex justify-end p-4">
               <button
                 onClick={() => setIsMenuOpen(false)}
-                className="text-white p-2"
+                className="text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+                aria-label="Fermer le menu de navigation"
                 data-testid="close-menu-btn"
               >
                 <X size={24} />
