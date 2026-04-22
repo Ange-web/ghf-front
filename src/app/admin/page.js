@@ -34,16 +34,6 @@ import Logo from '@/components/Logo';
 // Accent: #ff8a6d
 // Gold: #d6b37c
 
-const mockChartData = [
-  { name: 'Lun', revenus: 4000, reservations: 24 },
-  { name: 'Mar', revenus: 3000, reservations: 13 },
-  { name: 'Mer', revenus: 5000, reservations: 38 },
-  { name: 'Jeu', revenus: 8000, reservations: 55 },
-  { name: 'Ven', revenus: 15000, reservations: 120 },
-  { name: 'Sam', revenus: 22000, reservations: 180 },
-  { name: 'Dim', revenus: 7000, reservations: 40 },
-];
-
 // ──────────────────────────────────────────────────────────────
 // Instagram Curation Panel — composant autonome dans le dashboard
 // ──────────────────────────────────────────────────────────────
@@ -947,23 +937,22 @@ export default function AdminDashboard() {
                         <div className="p-6 bg-[#111] rounded-2xl border border-[#222] relative overflow-hidden group">
                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff6b4a]/10 rounded-full blur-3xl group-hover:bg-[#ff6b4a]/20 transition-all"></div>
                            <p className="text-white/40 text-sm font-medium mb-1 relative">Événements Actifs</p>
-                           <h3 className="text-3xl font-bold text-white relative">{stats?.total_events || 24}</h3>
+                           <h3 className="text-3xl font-bold text-white relative">{stats?.events ?? '—'}</h3>
                         </div>
                         <div className="p-6 bg-[#111] rounded-2xl border border-[#222] relative overflow-hidden group">
                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#d6b37c]/10 rounded-full blur-3xl group-hover:bg-[#d6b37c]/20 transition-all"></div>
                            <p className="text-white/40 text-sm font-medium mb-1 relative">Réservations VIP</p>
-                           <h3 className="text-3xl font-bold text-white relative">{stats?.total_reservations || 142}</h3>
-                           <span className="text-[#d6b37c] text-xs font-bold absolute bottom-6 right-6">+12%</span>
+                           <h3 className="text-3xl font-bold text-white relative">{stats?.reservations ?? '—'}</h3>
                         </div>
                         <div className="p-6 bg-[#111] rounded-2xl border border-[#222] relative overflow-hidden group">
                            <div className="absolute top-0 right-0 w-32 h-32 bg-[#ff8a6d]/10 rounded-full blur-3xl group-hover:bg-[#ff8a6d]/20 transition-all"></div>
                            <p className="text-white/40 text-sm font-medium mb-1 relative">Revenus Mensuels</p>
-                           <h3 className="text-3xl font-bold text-[#ff6b4a] relative">45,200€</h3>
+                           <h3 className="text-3xl font-bold text-[#ff6b4a] relative">{stats?.revenue != null ? stats.revenue.toLocaleString('fr-FR') : '—'}€</h3>
                         </div>
                         <div className="p-6 bg-[#111] rounded-2xl border border-[#222] relative overflow-hidden group">
                            <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-3xl group-hover:bg-white/10 transition-all"></div>
                            <p className="text-white/40 text-sm font-medium mb-1 relative">Membres VIP</p>
-                           <h3 className="text-3xl font-bold text-white relative">{stats?.total_users || 1205}</h3>
+                           <h3 className="text-3xl font-bold text-white relative">{stats?.users ?? '—'}</h3>
                         </div>
                       </div>
 
@@ -979,7 +968,7 @@ export default function AdminDashboard() {
                               </div>
                               <div className="h-72 w-full">
                                 <ResponsiveContainer width="100%" height={288} minWidth={0} minHeight={0}>
-                                  <AreaChart data={mockChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                                  <AreaChart data={stats?.revenueSeries || []} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                                     <defs>
                                       <linearGradient id="colorRevenus" x1="0" y1="0" x2="0" y2="1">
                                         <stop offset="5%" stopColor="#ff6b4a" stopOpacity={0.3}/>
@@ -998,25 +987,28 @@ export default function AdminDashboard() {
                           <div className="p-6 bg-[#111] rounded-2xl border border-[#222]">
                              <h3 className="font-bold text-lg mb-6">Activité Récente</h3>
                              <div className="space-y-5">
-                                {[
-                                    { msg: "Nouvelle réservation VIP (Table Or)", time: "Il y a 5 min", icon: Ticket, color: "text-[#d6b37c]", bg: "bg-[#d6b37c]/10" },
-                                    { msg: "Paiement reçu : Youssoupha Concert", time: "Il y a 12 min", icon: Check, color: "text-green-500", bg: "bg-green-500/10" },
-                                    { msg: "Nouveau membre inscrit", time: "Il y a 1h", icon: Users, color: "text-blue-500", bg: "bg-blue-500/10" },
-                                    { msg: "Modification d'événement (DJ Snake)", time: "Il y a 3h", icon: Calendar, color: "text-[#ff6b4a]", bg: "bg-[#ff6b4a]/10" },
-                                ].map((item, i) => (
-                                    <div key={i} className="flex gap-4 items-center">
-                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${item.bg} ${item.color} flex-shrink-0`}>
-                                            <item.icon size={18} />
+                                {(stats?.recentReservations || []).length === 0 && (
+                                  <p className="text-sm text-white/30 text-center py-4">Aucune réservation récente</p>
+                                )}
+                                {(stats?.recentReservations || []).map((r) => (
+                                    <div key={r.id} className="flex gap-4 items-center">
+                                        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#d6b37c]/10 text-[#d6b37c] flex-shrink-0">
+                                            <Ticket size={18} />
                                         </div>
-                                        <div>
-                                            <p className="text-sm font-medium text-white/90">{item.msg}</p>
-                                            <p className="text-xs text-white/40">{item.time}</p>
+                                        <div className="min-w-0">
+                                            <p className="text-sm font-medium text-white/90 truncate">
+                                              {r.user?.name || r.user?.email || 'Client'} — {r.event?.title || 'Événement'}
+                                            </p>
+                                            <p className="text-xs text-white/40">
+                                              {new Date(r.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                                              {r.status ? ` · ${r.status?.toUpperCase() ?? '—'}` : ''}
+                                            </p>
                                         </div>
                                     </div>
                                 ))}
                              </div>
-                             <button className="w-full mt-6 py-2 text-sm text-[#ff6b4a] font-medium border border-[#ff6b4a]/20 rounded-lg hover:bg-[#ff6b4a]/10 transition-colors">
-                                 Voir tout l'historique
+                             <button onClick={() => setActiveTab('reservations')} className="w-full mt-6 py-2 text-sm text-[#ff6b4a] font-medium border border-[#ff6b4a]/20 rounded-lg hover:bg-[#ff6b4a]/10 transition-colors">
+                                 Voir toutes les réservations
                              </button>
                           </div>
                       </div>
