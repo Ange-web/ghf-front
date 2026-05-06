@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,8 +10,8 @@ const faqs = [
     answer: "Vous pouvez réserver une table VIP directement depuis la page de l'événement souhaité en cliquant sur \"Réserver une table\", ou depuis l'onglet Réservations. Vous devrez être connecté à votre compte."
   },
   {
-    question: "Quels sont les avantages d'une Table Promo ?",
-    answer: "Les tables promo incluent l'entrée pour l'événement, un accès prioritaire, une table réservée pour vous et vos invités (jusqu'à 6 personnes selon l'option), ainsi qu'au moins une bouteille offerte."
+    question: "Quels sont les avantages d'une Table Ambassadeur ?",
+    answer: "Les tables ambassadeur incluent l'entrée pour l'événement, un accès prioritaire, une table réservée pour vous et vos invités (jusqu'à 6 personnes selon l'option), ainsi qu'au moins une bouteille offerte."
   },
   {
     question: "Est-il possible d'annuler une réservation ?",

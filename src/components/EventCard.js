@@ -189,12 +189,12 @@ export default function EventCard({ event, featured = false }) {
             )}
           </div>
 
-          {/* VIP / Promo badges */}
+          {/* VIP / Ambassadeur badges */}
           {(event.hasTablePromo || event.has_table_promo || event.hasTableVip || event.has_table_vip) && (
             <div className="absolute bottom-4 left-4 flex gap-2">
               {(event.hasTablePromo || event.has_table_promo) && (
                 <span className="bg-neon-red/80 text-white px-2 py-0.5 text-xs rounded font-medium">
-                  Tables Promo
+                  Tables Ambassadeur
                 </span>
               )}
               {(event.hasTableVip || event.has_table_vip) && (

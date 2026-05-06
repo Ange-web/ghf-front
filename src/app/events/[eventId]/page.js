@@ -176,7 +176,7 @@ export default function EventDetailPage() {
                   </Link>
                 </div>
 
-                {/* Table Promo */}
+                {/* Table Ambassadeur */}
                 {event.has_table_promo && (
                   <div className="bg-[#0F0F13] rounded-xl p-6 border border-neon-red/30 hover:border-neon-red transition-colors">
                     <div className="flex items-center gap-3 mb-4">
@@ -184,7 +184,7 @@ export default function EventDetailPage() {
                         <Sparkles className="text-neon-red" size={24} />
                       </div>
                       <div>
-                        <h3 className="text-white font-bold">Table Promo</h3>
+                        <h3 className="text-white font-bold">Table Ambassadeur</h3>
                         <p className="text-white/50 text-sm">Jusqu&apos;à 6 personnes</p>
                       </div>
                     </div>
@@ -270,7 +270,7 @@ export default function EventDetailPage() {
                 
                 {event.has_table_promo && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-white/60">Tables Promo</span>
+                    <span className="text-white/60">Tables Ambassadeur</span>
                     <span className="text-neon-red">{event.table_promo_available || 0}</span>
                   </div>
                 )}

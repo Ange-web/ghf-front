@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import { motion } from 'framer-motion';
@@ -31,7 +31,7 @@ export default function TermsPage() {
           <section className="space-y-4">
             <h2 className="text-2xl font-bold text-white">2. Réservations et Paiements</h2>
             <p>
-              Toutes les réservations sont soumises à disponibilité et confirmation. Les paiements ou arrhes versés pour la sécurisation des tables VIP ou Promo sont non-remboursables, sauf indication contraire explicite.
+              Toutes les réservations sont soumises à disponibilité et confirmation. Les paiements ou arrhes versés pour la sécurisation des tables VIP ou Ambassadeur sont non-remboursables, sauf indication contraire explicite.
             </p>
           </section>
 

@@ -1061,7 +1061,7 @@ export default function AdminDashboard() {
                                 <div className="flex justify-between items-center pt-4 border-t border-[#222]">
                                     <div className="text-xl font-black text-[#d6b37c]">{event.price}€</div>
                                     <div className="flex gap-2">
-                                        {event.has_table_promo && <span className="w-8 h-8 rounded bg-[#222] flex items-center justify-center text-white/50 text-xs" title="Tables Promo Actives"><Ticket size={14}/></span>}
+                                        {event.has_table_promo && <span className="w-8 h-8 rounded bg-[#222] flex items-center justify-center text-white/50 text-xs" title="Tables Ambassadeur Actives"><Ticket size={14}/></span>}
                                         {event.has_table_vip && <span className="w-8 h-8 rounded bg-[#d6b37c]/10 text-[#d6b37c] flex items-center justify-center text-xs border border-[#d6b37c]/20" title="VIP Tables Actives"><Trophy size={14}/></span>}
                                     </div>
                                 </div>
@@ -1504,20 +1504,20 @@ export default function AdminDashboard() {
                 )}
               </div>
 
-              {/* === SPECIFIC FOR VIP AND PROMO TABLES (EXTRACTED FROM OLD REACT APP) === */}
+              {/* === SPECIFIC FOR VIP AND AMBASSADEUR TABLES (EXTRACTED FROM OLD REACT APP) === */}
               {activeTab === 'events' && (
                   <div className="space-y-6 mt-6 border-t border-[#333] pt-6">
                       
-                      {/* Tables Promo */}
+                      {/* Tables Ambassadeur */}
                       <div className="bg-[#1a1a1a] p-5 rounded-2xl border border-[#222]">
                           <label className="flex items-center gap-3 cursor-pointer">
                               <input type="checkbox" checked={formData.has_table_promo || false} onChange={(e) => setFormData({...formData, has_table_promo: e.target.checked})} className="w-5 h-5 rounded accent-[#ff6b4a]" />
-                              <span className="text-white font-bold">Activer les Tables Promo</span>
+                              <span className="text-white font-bold">Activer les Tables Ambassadeur</span>
                           </label>
                           {formData.has_table_promo && (
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4">
                                   <div>
-                                      <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Prix Table Promo (€)</label>
+                                      <label className="block text-xs font-bold text-white/50 uppercase tracking-wider mb-2">Prix Table Ambassadeur (€)</label>
                                       <input type="number" value={formData.table_promo_price || 0} onChange={(e) => setFormData({...formData, table_promo_price: e.target.value})} className="w-full bg-[#111] border border-[#333] focus:border-[#ff6b4a] text-white px-4 py-3 rounded-xl outline-none transition-colors" />
                                   </div>
                                   <div>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -80,9 +80,9 @@ function TablePromoContent() {
           <div className="w-20 h-20 mx-auto bg-gradient-to-br from-neon-red to-neon-gold rounded-full flex items-center justify-center mb-6">
             <Check size={40} className="text-white" />
           </div>
-          <h2 className="heading-md text-white mb-4">Table Promo réservée !</h2>
+          <h2 className="heading-md text-white mb-4">Table Ambassadeur réservée !</h2>
           <p className="text-white/60 mb-8">
-            Votre table promo pour <span className="text-neon-red">{selectedEvent?.title}</span> a été réservée. 
+            Votre table ambassadeur pour <span className="text-neon-red">{selectedEvent?.title}</span> a été réservée.
             Un email de confirmation vous sera envoyé.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -107,9 +107,9 @@ function TablePromoContent() {
           </button>
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="text-neon-red" size={28} />
-            <span className="text-neon-red text-xs uppercase tracking-[0.2em]">Tables Promo</span>
+            <span className="text-neon-red text-xs uppercase tracking-[0.2em]">Tables Ambassadeur</span>
           </div>
-          <h1 className="heading-lg text-white mt-2">Réserver une Table Promo</h1>
+          <h1 className="heading-lg text-white mt-2">Réserver une Table Ambassadeur</h1>
           <p className="text-white/60 mt-4">
             Profitez d&apos;une expérience privilégiée avec votre groupe. Table réservée jusqu&apos;à 6 personnes.
           </p>
@@ -122,7 +122,7 @@ function TablePromoContent() {
         >
           <Info className="text-neon-red flex-shrink-0 mt-0.5" size={20} />
           <div className="text-sm text-white/70">
-            <p className="font-medium text-white mb-1">Inclus dans la Table Promo :</p>
+            <p className="font-medium text-white mb-1">Inclus dans la Table Ambassadeur :</p>
             <ul className="list-disc list-inside space-y-1">
               <li>Table réservée (4 à 6 personnes)</li>
               <li>1 bouteille offerte</li>
@@ -198,7 +198,7 @@ function TablePromoContent() {
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
                     <Sparkles className="text-neon-red" size={18} />
-                    <span className="text-neon-red text-sm font-semibold">Table Promo</span>
+                  <span className="text-neon-red text-sm font-semibold">Table Ambassadeur</span>
                   </div>
                   <h3 className="text-xl font-bold text-white mb-2">{selectedEvent.title}</h3>
                   <div className="space-y-2 text-sm mt-4">

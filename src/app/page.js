@@ -152,7 +152,7 @@ export default function HomePage() {
       <Marquee />
 
 
-      {/* ── PROMO GHF — TABLES OFFERTES ─────────────────────────── */}
+      {/* ── AMBASSADEUR GHF — TABLES OFFERTES ───────────────────── */}
       <section className="py-20 px-4 relative overflow-hidden" data-testid="promo-section">
         {/* Background glow */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -190,7 +190,7 @@ export default function HomePage() {
               <div className="flex-1 text-center md:text-left">
                 <span className="text-[#D4AF37] text-xs uppercase tracking-[0.25em] font-semibold">Offre exclusive</span>
                 <h2 className="heading-md text-white mt-2 mb-4">
-                  Tables <span className="text-[#D4AF37]">PROMO</span> par GHF Agency
+                  Tables <span className="text-[#D4AF37]">AMBASSADEUR</span> par GHF Agency
                 </h2>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
                   GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s'occupe de tout. 🥂
