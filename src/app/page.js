@@ -4,7 +4,7 @@ import React, { useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, ChevronDown, Sparkles, Wine, Music, Crown, Users, Star, MapPin, Shield } from 'lucide-react';
+import { ArrowRight, Calendar, ChevronDown, Sparkles, Wine, Music, Crown, Users, Star, MapPin, Shield, Gift, PartyPopper } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 import EventCard from '@/components/EventCard';
 import InstagramReviews from '@/components/InstagramReviews';
@@ -18,42 +18,8 @@ const fadeUp = (delay = 0) => ({
   transition: { duration: 0.65, delay, ease: [0.22, 1, 0.36, 1] },
 });
 
-// ── Services data ──────────────────────────────────────────────
-const SERVICES = [
-  {
-    icon: Crown,
-    label: 'Table VIP',
-    desc: 'Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire.',
-    color: 'from-[#D4AF37]/20 to-[#D4AF37]/5',
-    border: 'border-[#D4AF37]/20',
-    iconColor: 'text-[#D4AF37]',
-    href: '/booking',
-    cta: 'Réserver',
-    soon: false,
-  },
-  {
-    icon: Wine,
-    label: 'Table Promo',
-    desc: 'Profite d\'une table en club à tarif préférentiel. Idéal pour les groupes et les anniversaires.',
-    color: 'from-[#FF2D2D]/20 to-[#FF2D2D]/5',
-    border: 'border-[#FF2D2D]/20',
-    iconColor: 'text-[#FF2D2D]',
-    href: '/booking',
-    cta: 'Réserver',
-    soon: false,
-  },
-  {
-    icon: Music,
-    label: 'Restau Festif',
-    desc: 'Dîner gastronomique avec show live, ambiance clubbing et transition soirée incluse.',
-    color: 'from-[#833ab4]/10 to-[#833ab4]/5',
-    border: 'border-[#833ab4]/15',
-    iconColor: 'text-[#c084fc]',
-    href: null,
-    cta: null,
-    soon: true,
-  },
-];
+
+
 
 // ── Stats data ─────────────────────────────────────────────────
 const STATS = [
@@ -185,48 +151,158 @@ export default function HomePage() {
       {/* ── MARQUEE ─────────────────────────────────────────────── */}
       <Marquee />
 
-      {/* ── SERVICES ────────────────────────────────────────────── */}
-      <section className="py-20 px-4">
-        <div className="max-w-7xl mx-auto">
-          <motion.div className="text-center mb-14" {...fadeUp(0)}>
-            <span className="text-neon-gold text-xs uppercase tracking-[0.25em]">Ce qu'on propose</span>
-            <h2 className="heading-md text-white mt-2">Nos prestations</h2>
-          </motion.div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {SERVICES.map(({ icon: Icon, label, desc, color, border, iconColor, href, cta, soon }, i) => (
+      {/* ── PROMO GHF — TABLES OFFERTES ─────────────────────────── */}
+      <section className="py-20 px-4 relative overflow-hidden" data-testid="promo-section">
+        {/* Background glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[700px] h-[400px] bg-[#D4AF37]/8 blur-[140px] rounded-full" />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div
+            className="rounded-3xl border border-[#D4AF37]/20 bg-gradient-to-br from-[#D4AF37]/10 via-[#0F0F13] to-[#FF2D2D]/8 p-8 md:p-14 relative overflow-hidden"
+            {...fadeUp(0)}
+          >
+            {/* Decorative corner sparkle */}
+            <div className="absolute top-4 right-4 md:top-6 md:right-6 opacity-20">
+              <Sparkles size={40} className="text-[#D4AF37]" />
+            </div>
+            <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 opacity-10">
+              <PartyPopper size={32} className="text-[#FF2D2D]" />
+            </div>
+
+            {/* Grain texture */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none rounded-3xl"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
+
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+              {/* Icon */}
               <motion.div
-                key={label}
-                {...fadeUp(i * 0.1)}
-                className={`group relative rounded-2xl border ${border} bg-gradient-to-br ${color} p-7 overflow-hidden transition-transform duration-300 ${soon ? 'opacity-70 cursor-default' : 'hover:scale-[1.02]'}`}
+                className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-[#D4AF37]/20 to-[#D4AF37]/5 border border-[#D4AF37]/20 flex items-center justify-center"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
               >
-                {/* Badge Bientôt */}
-                {soon && (
-                  <span className="absolute top-4 right-4 px-2.5 py-1 rounded-full bg-[#833ab4]/30 border border-[#833ab4]/30 text-[#c084fc] text-[10px] font-bold uppercase tracking-wider">
-                    Bientôt
-                  </span>
-                )}
-
-                <div className={`w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center mb-5 ${iconColor}`}>
-                  <Icon size={22} />
-                </div>
-                <h3 className="text-white font-bold text-lg mb-2">{label}</h3>
-                <p className="text-white/50 text-sm leading-relaxed">{desc}</p>
-
-                {href && cta && (
-                  <Link
-                    href={href}
-                    className={`inline-flex items-center gap-1 mt-5 text-xs font-semibold ${iconColor} hover:gap-2 transition-all`}
-                  >
-                    {cta} <ArrowRight size={13} />
-                  </Link>
-                )}
-                {soon && (
-                  <p className="mt-5 text-white/25 text-xs">Disponible prochainement</p>
-                )}
+                <Gift size={36} className="text-[#D4AF37]" />
               </motion.div>
-            ))}
-          </div>
+
+              {/* Content */}
+              <div className="flex-1 text-center md:text-left">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-[0.25em] font-semibold">Offre exclusive</span>
+                <h2 className="heading-md text-white mt-2 mb-4">
+                  Tables <span className="text-[#D4AF37]">PROMO</span> par GHF Agency
+                </h2>
+                <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
+                  GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s'occupe de tout. 🥂
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap justify-center md:justify-start gap-2.5 mt-5">
+                  {[
+                    { label: '🎂 Anniversaires', color: 'bg-[#FF2D2D]/15 border-[#FF2D2D]/25 text-[#FF2D2D]' },
+                    { label: '👰 EVJF', color: 'bg-[#c084fc]/15 border-[#c084fc]/25 text-[#c084fc]' },
+                    { label: '✨ Soirées entre amies', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                  ].map(({ label, color }) => (
+                    <span
+                      key={label}
+                      className={`inline-flex items-center px-3.5 py-1.5 rounded-full border text-xs font-medium ${color}`}
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <motion.div className="mt-7" {...fadeUp(0.15)}>
+                  <Link
+                    href="/booking"
+                    className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold animate-glow-pulse"
+                    data-testid="promo-booking-btn"
+                  >
+                    <Calendar size={16} />
+                    Réserver ma table offerte
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* ── TABLE VIP ────────────────────────────────────────────── */}
+      <section className="py-20 px-4 relative overflow-hidden bg-black/40" data-testid="vip-section">
+        {/* Background glow */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div className="w-[700px] h-[400px] bg-[#D4AF37]/10 blur-[140px] rounded-full" />
+        </div>
+
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.div
+            className="rounded-3xl border border-[#D4AF37]/30 bg-gradient-to-br from-[#D4AF37]/12 via-[#0F0F13] to-[#D4AF37]/6 p-8 md:p-14 relative overflow-hidden"
+            {...fadeUp(0)}
+          >
+            {/* Decorative corner sparkle */}
+            <div className="absolute top-4 right-4 md:top-6 md:right-6 opacity-20">
+              <Sparkles size={40} className="text-[#D4AF37]" />
+            </div>
+            <div className="absolute bottom-4 left-4 md:bottom-6 md:left-6 opacity-10">
+              <Wine size={32} className="text-[#D4AF37]" />
+            </div>
+
+            {/* Grain texture */}
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none rounded-3xl"
+              style={{ backgroundImage: 'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 256 256\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.9\' numOctaves=\'4\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\'/%3E%3C/svg%3E")' }} />
+
+            <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
+              {/* Icon */}
+              <motion.div
+                className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-[#D4AF37]/25 to-[#D4AF37]/8 border border-[#D4AF37]/30 flex items-center justify-center"
+                animate={{ y: [0, -6, 0] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+              >
+                <Crown size={36} className="text-[#D4AF37]" />
+              </motion.div>
+
+              {/* Content */}
+              <div className="flex-1 text-center md:text-left">
+                <span className="text-[#D4AF37] text-xs uppercase tracking-[0.25em] font-semibold">Expérience premium</span>
+                <h2 className="heading-md text-white mt-2 mb-4">
+                  Tables <span className="text-[#D4AF37]">VIP</span> par GHF Agency
+                </h2>
+                <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
+                  Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire. L'excellence pour vos soirées. 👑
+                </p>
+
+                {/* Tags */}
+                <div className="flex flex-wrap justify-center md:justify-start gap-2.5 mt-5">
+                  {[
+                    { label: '🍾 Bouteilles premium', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: '🛋️ Carré privatisé', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: '⚡ Accès prioritaire', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                  ].map(({ label, color }) => (
+                    <span
+                      key={label}
+                      className={`inline-flex items-center px-3.5 py-1.5 rounded-full border text-xs font-medium ${color}`}
+                    >
+                      {label}
+                    </span>
+                  ))}
+                </div>
+
+                {/* CTA */}
+                <motion.div className="mt-7" {...fadeUp(0.15)}>
+                  <Link
+                    href="/booking"
+                    className="btn-secondary inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold border-[#D4AF37] text-[#D4AF37] hover:bg-[#D4AF37] hover:text-black"
+                    data-testid="vip-booking-btn"
+                  >
+                    <Crown size={16} />
+                    Réserver ma table VIP
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </motion.div>
         </div>
       </section>
 

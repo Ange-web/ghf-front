@@ -322,19 +322,24 @@ export default function ContestsPage() {
       {/* ── How to participate ─────────────────────────────── */}
       <div className="max-w-4xl mx-auto px-4 mt-20">
         <motion.div
-          className="bg-[#0F0F13] rounded-2xl p-8 md:p-10 border border-white/8"
+          className="bg-[#0F0F13] rounded-2xl p-8 md:p-12 border border-white/10 shadow-[0_24px_70px_rgba(0,0,0,0.55)]"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
         >
-          <div className="text-center mb-10">
-            <span className="text-neon-gold text-xs uppercase tracking-[0.2em]">Simple &amp; rapide</span>
-            <h3 className="text-xl font-bold text-white mt-2">Comment participer ?</h3>
+          <div className="text-center mb-12">
+            <span className="text-neon-gold text-xs uppercase tracking-[0.3em]">Simple &amp; rapide</span>
+            <h3 className="text-2xl md:text-3xl font-extrabold text-white mt-3 uppercase tracking-[0.12em]">
+              Comment participer ?
+            </h3>
           </div>
 
           <div className="grid md:grid-cols-3 gap-0 relative">
             {/* Connecting line desktop */}
-            <div className="hidden md:block absolute top-8 left-[16.66%] right-[16.66%] h-px bg-gradient-to-r from-neon-red/30 via-neon-gold/30 to-neon-red/30" aria-hidden="true" />
+            <div
+              className="hidden md:block absolute top-10 left-[16.66%] right-[16.66%] h-px bg-neon-gold/25"
+              aria-hidden="true"
+            />
 
             {[
               { num: 1, icon: Star, title: 'Créez un compte', desc: 'Inscrivez-vous gratuitement sur notre plateforme' },
@@ -343,16 +348,16 @@ export default function ContestsPage() {
             ].map(({ num, icon: Icon, title, desc }) => (
               <div key={num} className="flex flex-col items-center text-center px-6 gap-4">
                 <div className="relative">
-                  <div className="w-16 h-16 rounded-full bg-gradient-to-br from-neon-red/20 to-neon-gold/10 border border-white/10 flex items-center justify-center z-10 relative">
-                    <Icon size={24} className="text-neon-gold" />
+                  <div className="w-20 h-20 rounded-full bg-[#1A1012] border border-neon-gold/10 shadow-[0_0_0_1px_rgba(255,255,255,0.04)_inset] flex items-center justify-center z-10 relative">
+                    <Icon size={26} className="text-neon-gold" />
                   </div>
-                  <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-neon-red text-white text-[10px] font-bold flex items-center justify-center z-20">
+                  <span className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-neon-red text-white text-[11px] font-bold flex items-center justify-center z-20 shadow-[0_6px_14px_rgba(0,0,0,0.45)]">
                     {num}
                   </span>
                 </div>
                 <div>
-                  <p className="text-white font-semibold mb-1">{title}</p>
-                  <p className="text-white/45 text-sm leading-relaxed">{desc}</p>
+                  <p className="text-white font-semibold text-lg mb-2">{title}</p>
+                  <p className="text-white/45 text-sm leading-relaxed max-w-[240px] mx-auto">{desc}</p>
                 </div>
               </div>
             ))}
