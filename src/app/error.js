@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from 'react';
 import { AlertCircle, RefreshCcw } from 'lucide-react';
@@ -16,7 +16,7 @@ export default function Error({ error, reset }) {
       </div>
       <h2 className="heading-md text-white mb-4">Une erreur est survenue !</h2>
       <p className="text-white/60 max-w-md mx-auto mb-8">
-        Nous sommes désolés, mais une erreur inattendue s'est produite lors de l'affichage de cette page.
+        Nous sommes désolés, mais une erreur inattendue s&apos;est produite lors de l&apos;affichage de cette page.
       </p>
       <button
         onClick={() => reset()}

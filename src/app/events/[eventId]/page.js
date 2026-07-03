@@ -185,7 +185,7 @@ export default function EventDetailPage() {
                       </div>
                       <div>
                         <h3 className="text-white font-bold">Table Ambassadeur</h3>
-                        <p className="text-white/50 text-sm">Jusqu&apos;à 6 personnes</p>
+                        <p className="text-white/50 text-sm">Jusqu&apos;à 15 personnes</p>
                       </div>
                     </div>
                     <p className="text-2xl font-bold text-neon-red mb-4">

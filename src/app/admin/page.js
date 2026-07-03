@@ -243,7 +243,7 @@ function InstagramCurationPanel() {
             Ajouter un avis manuellement
           </h3>
           <p className="text-white/40 text-xs mb-4 leading-relaxed">
-            Lis le DM sur ton Instagram, puis retranscris-le ici. L'avis sera affiché avec le badge "Vérifié Instagram".
+            Lis le DM sur ton Instagram, puis retranscris-le ici. L&apos;avis sera affiché avec le badge &quot;Vérifié Instagram&quot;.
           </p>
           <form onSubmit={handleManualSubmit} className="flex flex-col gap-3">
             <div className="flex gap-3">
@@ -333,7 +333,7 @@ function InstagramCurationPanel() {
             Configuration du Token Meta
           </h3>
           <p className="text-white/40 text-xs mb-4 leading-relaxed">
-            1. Va sur <span className="text-[#fcb045]">developers.facebook.com → Explorateur d'API Graph</span><br/>
+            1. Va sur <span className="text-[#fcb045]">developers.facebook.com → Explorateur d&apos;API Graph</span><br/>
             2. Génère un token avec les permissions : <code className="bg-white/10 px-1 rounded">instagram_manage_messages</code>, <code className="bg-white/10 px-1 rounded">instagram_basic</code><br/>
             3. Colle-le ci-dessous. Il sera échangé automatiquement en Long-lived Token (60 jours).
           </p>
@@ -450,7 +450,7 @@ function InstagramCurationPanel() {
                   </div>
                 ) : (
                   <>
-                    <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-4">"{msg.content}"</p>
+                    <p className="text-white/70 text-sm leading-relaxed mb-4 line-clamp-4">“{msg.content}”</p>
                     <div className="flex gap-2">
                       <button
                         onClick={() => startEdit(msg)}
@@ -512,7 +512,7 @@ function InstagramCurationPanel() {
                     </div>
                   </div>
                   {msg.authorRole && <p className="text-white/30 text-xs mb-1">{msg.authorRole}</p>}
-                  <p className="text-white/60 text-xs leading-relaxed line-clamp-2">"{msg.content}"</p>
+                  <p className="text-white/60 text-xs leading-relaxed line-clamp-2">“{msg.content}”</p>
                 </div>
                 <button
                   onClick={() => handleUnpublish(msg.id)}

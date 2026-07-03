@@ -16,9 +16,15 @@ const navLinks = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
+
+  // Remount on route changes to reset menu state
+  return <HeaderInner key={pathname} pathname={pathname} />;
+}
+
+function HeaderInner({ pathname }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const pathname = usePathname();
   const { user, isAuthenticated, isAdmin, logout, openAuthModal } = useAuth();
 
   useEffect(() => {
@@ -28,10 +34,6 @@ export default function Header() {
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-  }, [pathname]);
 
   return (
     <>

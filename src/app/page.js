@@ -90,7 +90,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            L'accès aux lieux les plus sélects de Paris. Tables VIP, soirées privées et expériences sur-mesure.
+            L&apos;accès aux lieux les plus sélects de Paris. Tables VIP, soirées privées et expériences sur-mesure.
           </motion.p>
 
           <motion.div
@@ -193,7 +193,7 @@ export default function HomePage() {
                   Tables <span className="text-[#D4AF37]">AMBASSADEUR</span> par GHF Agency
                 </h2>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
-                  GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s'occupe de tout. 🥂
+                  GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s&apos;occupe de tout. 🥂
                 </p>
 
                 {/* Tags */}
@@ -215,7 +215,7 @@ export default function HomePage() {
                 {/* CTA */}
                 <motion.div className="mt-7" {...fadeUp(0.15)}>
                   <Link
-                    href="/booking"
+                    href="/tables/ambassadeur"
                     className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold animate-glow-pulse"
                     data-testid="promo-booking-btn"
                   >
@@ -270,7 +270,7 @@ export default function HomePage() {
                   Tables <span className="text-[#D4AF37]">VIP</span> par GHF Agency
                 </h2>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
-                  Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire. L'excellence pour vos soirées. 👑
+                  Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire. L&apos;excellence pour vos soirées. 👑
                 </p>
 
                 {/* Tags */}
@@ -426,7 +426,7 @@ export default function HomePage() {
             className="inline-block text-neon-gold text-xs uppercase tracking-[0.3em] mb-5"
             {...fadeUp(0)}
           >
-            Rejoignez l'élite
+            Rejoignez l&apos;élite
           </motion.span>
           <motion.h2
             className="heading-lg text-white mb-6 leading-tight"

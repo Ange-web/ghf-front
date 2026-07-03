@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     question: "Quels sont les avantages d'une Table Ambassadeur ?",
-    answer: "Les tables ambassadeur incluent l'entrée pour l'événement, un accès prioritaire, une table réservée pour vous et vos invités (jusqu'à 6 personnes selon l'option), ainsi qu'au moins une bouteille offerte."
+    answer: "Les tables ambassadeur incluent l'entrée pour l'événement, un accès prioritaire, une table réservée pour vous et vos invités (jusqu'à 15 personnes selon l'option), ainsi qu'au moins une bouteille offerte."
   },
   {
     question: "Est-il possible d'annuler une réservation ?",
