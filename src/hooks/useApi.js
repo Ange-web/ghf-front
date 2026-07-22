@@ -21,6 +21,7 @@ export function useApi(url, { enabled = true, ttl = CACHE_TTL } = {}) {
     return entry && Date.now() - entry.ts < ttl ? entry.data : null;
   });
   const [loading, setLoading] = useState(() => {
+    if (!enabled) return false;
     const entry = cache.get(url);
     return !(entry && Date.now() - entry.ts < ttl);
   });
