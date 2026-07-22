@@ -14,6 +14,9 @@ export default function CookieConsent() {
     try {
       const existing = window.localStorage.getItem(CONSENT_KEY);
       if (!existing) {
+        // Lecture ponctuelle de localStorage au montage (pas de source React) :
+        // il n'y a pas d'alternative sans effet pour synchroniser cet état externe.
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setVisible(true);
       }
     } catch {
