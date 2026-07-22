@@ -8,6 +8,7 @@ import SplashScreen from "@/components/SplashScreen";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import AuthModal from "@/components/AuthModal";
+import CookieConsent from "@/components/CookieConsent";
 import { Toaster } from "@/components/ui/sonner";
 
 export function ClientLayout({ children }) {
@@ -40,7 +41,9 @@ export function ClientLayout({ children }) {
             {!isAdminRoute && <Footer />}
             
             <AuthModal />
-            
+
+            <CookieConsent />
+
             <Toaster position="top-right" />
           </div>
         </div>
