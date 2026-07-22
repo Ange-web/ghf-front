@@ -1,5 +1,3 @@
-@AGENTS.md
-
 # RÈGLES DE TRAVAIL — À LIRE ET APPLIQUER À CHAQUE SESSION
 
 ## Règle 1 — Planifier avant de coder
