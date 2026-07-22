@@ -33,7 +33,7 @@ export default function TestimonialCard({ testimonial, index = 0 }) {
       {/* Author */}
       <div className="flex items-center gap-3">
         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-neon-red to-neon-gold flex items-center justify-center text-white font-bold">
-          {testimonial.authorName?.charAt(0).toUpperCase() || 'U'}
+          {testimonial.authorName?.charAt(0)?.toUpperCase() || 'U'}
         </div>
         <div>
           <p className="text-white font-medium text-sm">{testimonial.authorName || 'Utilisateur anonyme'}</p>
