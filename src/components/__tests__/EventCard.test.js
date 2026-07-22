@@ -19,13 +19,15 @@ describe('EventCard', () => {
 
     expect(screen.getByText('Soirée Néon')).toBeInTheDocument();
     expect(screen.getByText('Le Klub')).toBeInTheDocument();
-    expect(screen.getByText('25€')).toBeInTheDocument();
+    // Le prix est affiché à deux endroits (badge sur l'image + bloc de contenu)
+    expect(screen.getAllByText('25€').length).toBeGreaterThan(0);
     expect(screen.getByText(/places restantes/)).toBeInTheDocument();
   });
 
   it('affiche "Gratuit" quand le prix est 0', () => {
     render(<EventCard event={{ ...baseEvent, price: 0 }} />);
-    expect(screen.getByText('Gratuit')).toBeInTheDocument();
+    // Le prix est affiché à deux endroits (badge sur l'image + bloc de contenu)
+    expect(screen.getAllByText('Gratuit').length).toBeGreaterThan(0);
   });
 
   it('indique "Complet" quand il ne reste plus de places', () => {
