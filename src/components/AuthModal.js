@@ -82,20 +82,24 @@ export default function AuthModal() {
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.9, opacity: 0, y: 20 }}
             transition={{ type: 'spring', duration: 0.5 }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-modal-title"
             data-testid="auth-modal"
           >
             {/* Close Button */}
             <button
               onClick={closeAuthModal}
               className="absolute top-4 right-4 text-white/50 hover:text-white transition-colors"
+              aria-label="Fermer la fenêtre de connexion"
               data-testid="auth-modal-close"
             >
-              <X size={24} />
+              <X size={24} aria-hidden="true" />
             </button>
 
             {/* Header */}
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-white">
+              <h2 id="auth-modal-title" className="text-2xl font-bold text-white">
                 {mode === 'login' ? 'Connexion' : 'Inscription'}
               </h2>
               <p className="text-white/60 text-sm mt-2">
@@ -111,10 +115,11 @@ export default function AuthModal() {
               {mode === 'register' && (
                 <>
                   <div>
-                    <label className="block text-sm text-white/70 mb-2">Nom complet</label>
+                    <label htmlFor="auth-name" className="block text-sm text-white/70 mb-2">Nom complet</label>
                     <div className="relative">
-                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} aria-hidden="true" />
                       <input
+                        id="auth-name"
                         type="text"
                         name="name"
                         value={formData.name}
@@ -127,10 +132,11 @@ export default function AuthModal() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-white/70 mb-2">Instagram (facultatif)</label>
+                    <label htmlFor="auth-instagram" className="block text-sm text-white/70 mb-2">Instagram (facultatif)</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">@</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold" aria-hidden="true">@</span>
                       <input
+                        id="auth-instagram"
                         type="text"
                         name="instagram"
                         value={formData.instagram}
@@ -141,10 +147,11 @@ export default function AuthModal() {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm text-white/70 mb-2">Numéro de téléphone (facultatif)</label>
+                    <label htmlFor="auth-phone" className="block text-sm text-white/70 mb-2">Numéro de téléphone (facultatif)</label>
                     <div className="relative">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold">#</span>
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40 font-bold" aria-hidden="true">#</span>
                       <input
+                        id="auth-phone"
                         type="tel"
                         name="phone"
                         value={formData.phone}
@@ -158,10 +165,11 @@ export default function AuthModal() {
               )}
 
               <div>
-                <label className="block text-sm text-white/70 mb-2">Email</label>
+                <label htmlFor="auth-email" className="block text-sm text-white/70 mb-2">Email</label>
                 <div className="relative">
-                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} aria-hidden="true" />
                   <input
+                    id="auth-email"
                     type="email"
                     name="email"
                     value={formData.email}
@@ -175,10 +183,11 @@ export default function AuthModal() {
               </div>
 
               <div>
-                <label className="block text-sm text-white/70 mb-2">Mot de passe</label>
+                <label htmlFor="auth-password" className="block text-sm text-white/70 mb-2">Mot de passe</label>
                 <div className="relative">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} aria-hidden="true" />
                   <input
+                    id="auth-password"
                     type={showPassword ? 'text' : 'password'}
                     name="password"
                     value={formData.password}
@@ -193,8 +202,9 @@ export default function AuthModal() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/60"
+                    aria-label={showPassword ? 'Masquer le mot de passe' : 'Afficher le mot de passe'}
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
                   </button>
                 </div>
               </div>
