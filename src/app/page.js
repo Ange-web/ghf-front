@@ -256,7 +256,7 @@ export default function HomePage() {
             <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12 relative z-10">
               {/* Icon */}
               <motion.div
-                className="flex-shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-[#D4AF37]/25 to-[#D4AF37]/8 border border-[#D4AF37]/30 flex items-center justify-center"
+                className="neon-badge flex-shrink-0 w-20 h-20 md:w-24 md:h-24 flex items-center justify-center text-[#D4AF37]"
                 animate={{ y: [0, -6, 0] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
               >
