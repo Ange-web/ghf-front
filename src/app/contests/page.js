@@ -45,7 +45,7 @@ export default function ContestsPage() {
     try {
       await api.post(`/api/contests/${contestId}/participate`, { contest_id: contestId });
       setParticipatedIds(prev => new Set([...prev, contestId]));
-      toast.success('Participation enregistrée ! Bonne chance 🎉');
+      toast.success('Participation enregistrée ! Bonne chance.');
       fetchContests();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Erreur lors de la participation');

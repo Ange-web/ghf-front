@@ -4,7 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Calendar, MapPin, Users, ArrowRight } from 'lucide-react';
+import { Calendar, MapPin, Users, ArrowRight, Zap } from 'lucide-react';
 import CountdownTimer from './CountdownTimer';
 
 export default function EventCard({ event, featured = false }) {
@@ -229,11 +229,11 @@ export default function EventCard({ event, featured = false }) {
           {/* Spots + progress bar */}
           <div className="mb-4">
             <div className="flex items-center justify-between mb-1.5">
-              <span className={`text-xs font-medium ${spotsTextColor}`}>
+              <span className={`text-xs font-medium flex items-center gap-1 ${spotsTextColor}`}>
                 {isSoldOut
                   ? 'Complet'
                   : spotsPercent !== null && spotsPercent < 20
-                    ? `⚡ Plus que ${spotsLeft} place${spotsLeft > 1 ? 's' : ''} !`
+                    ? <><Zap size={12} className="fill-current" /> Plus que {spotsLeft} place{spotsLeft > 1 ? 's' : ''} !</>
                     : `${spotsLeft} places restantes`
                 }
               </span>

@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Star, ChevronLeft, ChevronRight, Phone, Video, Info } from 'lucide-react';
+import { Star, ChevronLeft, ChevronRight, Phone, Video, Info, Heart } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
 
 // ── Icônes inline ──────────────────────────────────────────────
@@ -127,7 +127,7 @@ function DMCard({ review, index }) {
 
             {/* Réaction cœur */}
             <div className="flex items-center gap-1.5 ml-1">
-              <span className="text-base leading-none">❤️</span>
+              <Heart size={13} className="fill-[#ff3040] text-[#ff3040]" />
               <span className="text-white/30 text-[10px]">GHF Agency a aimé</span>
             </div>
           </div>

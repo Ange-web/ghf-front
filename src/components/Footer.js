@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Mail, MapPin, Phone } from 'lucide-react';
+import { Mail, MapPin, Phone, Heart } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -145,8 +145,8 @@ export default function Footer() {
           <p className="text-white/30 text-sm">
             © {new Date().getFullYear()} GHF Agency. Tous droits réservés.
           </p>
-          <p className="text-white/30 text-sm">
-            Crafted with <span className="text-neon-red">♥</span> in Paris
+          <p className="text-white/30 text-sm flex items-center gap-1">
+            Crafted with <Heart size={13} className="fill-neon-red text-neon-red" /> in Paris
           </p>
         </div>
       </div>
