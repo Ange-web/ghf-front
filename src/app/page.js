@@ -193,15 +193,15 @@ export default function HomePage() {
                   Tables <span className="text-[#D4AF37]">AMBASSADEUR</span> par GHF Agency
                 </h2>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
-                  GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s&apos;occupe de tout. 🥂
+                  GHF Agency te propose des tables offertes — idéal pour les anniversaires, EVJF et soirées entre amies. Accès facilité, ambiance garantie. On s&apos;occupe de tout.
                 </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-2.5 mt-5">
                   {[
-                    { label: '🎂 Anniversaires', color: 'bg-[#FF2D2D]/15 border-[#FF2D2D]/25 text-[#FF2D2D]' },
-                    { label: '👰 EVJF', color: 'bg-[#c084fc]/15 border-[#c084fc]/25 text-[#c084fc]' },
-                    { label: '✨ Soirées entre amies', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: 'Anniversaires', color: 'bg-[#FF2D2D]/15 border-[#FF2D2D]/25 text-[#FF2D2D]' },
+                    { label: 'EVJF', color: 'bg-[#c084fc]/15 border-[#c084fc]/25 text-[#c084fc]' },
+                    { label: 'Soirées entre amies', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
                   ].map(({ label, color }) => (
                     <span
                       key={label}
@@ -270,15 +270,15 @@ export default function HomePage() {
                   Tables <span className="text-[#D4AF37]">VIP</span> par GHF Agency
                 </h2>
                 <p className="text-white/55 text-sm md:text-base leading-relaxed max-w-xl">
-                  Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire. L&apos;excellence pour vos soirées. 👑
+                  Carré privatisé dans les meilleurs clubs parisiens. Bouteilles premium, service dédié et accès prioritaire. L&apos;excellence pour vos soirées.
                 </p>
 
                 {/* Tags */}
                 <div className="flex flex-wrap justify-center md:justify-start gap-2.5 mt-5">
                   {[
-                    { label: '🍾 Bouteilles premium', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
-                    { label: '🛋️ Carré privatisé', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
-                    { label: '⚡ Accès prioritaire', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: 'Bouteilles premium', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: 'Carré privatisé', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
+                    { label: 'Accès prioritaire', color: 'bg-[#D4AF37]/15 border-[#D4AF37]/25 text-[#D4AF37]' },
                   ].map(({ label, color }) => (
                     <span
                       key={label}
