@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Mail, MapPin, Phone, Heart } from 'lucide-react';
+import { Mail, MapPin } from 'lucide-react';
 import Logo from './Logo';
 
 export default function Footer() {
@@ -14,13 +14,13 @@ export default function Footer() {
           <div className="md:col-span-1">
             <Logo />
             <p className="text-white/50 text-sm leading-relaxed">
-              L&apos;agence événementielle qui transforme vos nuits en expériences inoubliables.
+              Tables offertes, accès VIP, soirées privées — GHF organise les meilleures nuits de Paris.
             </p>
-            
+
             {/* Social Links */}
             <div className="flex gap-4 mt-6">
               <a
-                href="https://instagram.com"
+                href="https://instagram.com/girlshavefun.agency"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Suivez-nous sur Instagram"
@@ -34,19 +34,19 @@ export default function Footer() {
                 </svg>
               </a>
               <a
-                href="https://twitter.com"
+                href="https://tiktok.com/@girlshavefun.agency"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Suivez-nous sur Twitter / X"
+                aria-label="Suivez-nous sur TikTok"
                 className="text-white/40 hover:text-neon-red transition-colors"
-                data-testid="social-twitter"
+                data-testid="social-tiktok"
               >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"/>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/>
                 </svg>
               </a>
               <a
-                href="https://youtube.com"
+                href="https://youtube.com/@girlshavefunagency"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Suivez-nous sur YouTube"
@@ -129,10 +129,6 @@ export default function Footer() {
                 Paris, France
               </li>
               <li className="flex items-center gap-3 text-white/50 text-sm">
-                <Phone size={16} className="text-neon-red" />
-                +33 1 23 45 67 89
-              </li>
-              <li className="flex items-center gap-3 text-white/50 text-sm">
                 <Mail size={16} className="text-neon-red" />
                 contact@ghfagency.com
               </li>
@@ -145,8 +141,8 @@ export default function Footer() {
           <p className="text-white/30 text-sm">
             © {new Date().getFullYear()} GHF Agency. Tous droits réservés.
           </p>
-          <p className="text-white/30 text-sm flex items-center gap-1">
-            Crafted with <Heart size={13} className="fill-neon-red text-neon-red" /> in Paris
+          <p className="text-white/30 text-sm">
+            Paris · Nightlife · VIP
           </p>
         </div>
       </div>

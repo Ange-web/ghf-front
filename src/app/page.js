@@ -62,42 +62,41 @@ export default function HomePage() {
         <div className="hero-content max-w-7xl mx-auto pt-28 md:pt-36">
           {/* Trust badge */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-6"
           >
-            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/60 text-xs uppercase tracking-widest backdrop-blur-sm">
-              <Shield size={12} className="text-[#D4AF37]" />
-              Paris — Agence Événementielle #1
+            <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/50 text-xs uppercase tracking-widest backdrop-blur-sm">
+              Paris · Nightlife · VIP
             </span>
           </motion.div>
 
           <motion.h1
             className="heading-xl text-white max-w-4xl"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.25 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
           >
-            Vivez des{' '}
-            <span className="text-gradient">expériences</span>
-            {' '}inoubliables
+            La nuit{' '}
+            <span className="text-[#FF2D2D]">t&apos;appartient.</span>
           </motion.h1>
 
           <motion.p
-            className="text-white/60 text-base md:text-lg max-w-lg mt-5 leading-relaxed"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            className="text-white/55 text-base md:text-lg max-w-lg mt-5 leading-relaxed font-light"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            L&apos;accès aux lieux les plus sélects de Paris. Tables VIP, soirées privées et expériences sur-mesure.
+            Tables offertes, accès VIP, soirées privées à Paris —
+            GHF sélectionne les meilleures nuits pour toi.
           </motion.p>
 
           <motion.div
             className="flex flex-col sm:flex-row gap-3 mt-8"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.55 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.55 }}
           >
             <Link
               href="/booking"
@@ -105,7 +104,7 @@ export default function HomePage() {
               data-testid="hero-booking-btn"
             >
               <Calendar size={18} />
-              Réserver maintenant
+              Réserver ma table
             </Link>
             <Link
               href="/events"
@@ -120,9 +119,9 @@ export default function HomePage() {
           {/* Hero stats */}
           <motion.div
             className="flex flex-wrap gap-6 mt-14"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.75 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
           >
             {STATS.map(({ value, label }) => (
               <div key={label} className="flex flex-col">
@@ -216,7 +215,7 @@ export default function HomePage() {
                 <motion.div className="mt-7" {...fadeUp(0.15)}>
                   <Link
                     href="/tables/ambassadeur"
-                    className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold animate-glow-pulse"
+                    className="btn-primary inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold"
                     data-testid="promo-booking-btn"
                   >
                     <Calendar size={16} />
@@ -422,36 +421,31 @@ export default function HomePage() {
         </div>
 
         <div className="max-w-3xl mx-auto text-center relative z-10">
-          <motion.span
-            className="inline-block text-neon-gold text-xs uppercase tracking-[0.3em] mb-5"
-            {...fadeUp(0)}
-          >
-            Rejoignez l&apos;élite
-          </motion.span>
           <motion.h2
             className="heading-lg text-white mb-6 leading-tight"
-            {...fadeUp(0.1)}
+            {...fadeUp(0)}
           >
-            Prêt à vivre une{' '}
-            <span className="text-neon-red">expérience unique</span>&nbsp;?
+            Ta prochaine nuit,{' '}
+            <span className="text-[#FF2D2D]">c&apos;est maintenant.</span>
           </motion.h2>
           <motion.p
-            className="text-white/50 text-base md:text-lg mb-10 max-w-xl mx-auto"
-            {...fadeUp(0.2)}
+            className="text-white/50 text-base md:text-lg mb-10 max-w-xl mx-auto font-light"
+            {...fadeUp(0.1)}
           >
-            Tables VIP, soirées sur-mesure, accès exclusifs. Réservez maintenant et rejoignez-nous.
+            Tables offertes pour les anniversaires &amp; EVJF.
+            Accès prioritaire. Zéro stress.
           </motion.p>
           <motion.div
             className="flex flex-col sm:flex-row gap-3 justify-center"
-            {...fadeUp(0.3)}
+            {...fadeUp(0.2)}
           >
             <Link
               href="/booking"
-              className="btn-primary inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full text-base font-semibold animate-glow-pulse"
+              className="btn-primary inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full text-base font-semibold"
               data-testid="cta-booking-btn"
             >
               <Calendar size={18} />
-              Réserver maintenant
+              Réserver ma table
             </Link>
             <Link
               href="/events"

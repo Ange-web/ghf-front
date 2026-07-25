@@ -5,13 +5,13 @@ import FastMarquee from 'react-fast-marquee';
 
 export default function Marquee() {
   const items = [
-    'UPCOMING EVENTS',
-    'VIP TABLES',
-    'EXCLUSIVE BOOKING',
-    'NEON NIGHTS',
-    'GOLDEN LUXE',
-    'TECHNO TEMPLE',
-    'JOIN THE PARTY',
+    'TABLES OFFERTES',
+    'ANNIVERSAIRES & EVJF',
+    'ACCÈS VIP',
+    'CLUBS PARISIENS',
+    'RÉSERVATION RAPIDE',
+    'SOIRÉES PRIVÉES',
+    'GIRLS HAVE FUN',
   ];
 
   return (
